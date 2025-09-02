@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block title %}Geolocation Tracker - OSINT Tools{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="cyber-card mb-4">
+                <div class="card-body text-center">
+                    <h1 class="display-4 cyber-text-glow mb-3">
+                        <i class="fas fa-crosshairs text-danger"></i> 
+                        GEO<span class="text-cyan">LOCATION</span> TRACKER
+                    </h1>
+                    <p class="lead text-light">Advanced geolocation tool using social engineering templates</p>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="cyber-card h-100">
+                        <div class="card-body text-center">
+                            <div class="cyber-stat-icon mb-3">
+                                <i class="fas fa-play-circle text-success fa-3x"></i>
+                            </div>
+                            <h3 class="cyber-text-glow">{{ stats.active_sessions }}</h3>
+                            <p class="text-light mb-0">Active Sessions</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="cyber-card h-100">
+                        <div class="card-body text-center">
+                            <div class="cyber-stat-icon mb-3">
+                                <i class="fas fa-list text-info fa-3x"></i>
+                            </div>
+                            <h3 class="cyber-text-glow">{{ stats.total_sessions }}</h3>
+                            <p class="text-light mb-0">Total Sessions</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="cyber-card h-100">
+                        <div class="card-body text-center">
+                            <div class="cyber-stat-icon mb-3">
+                                <i class="fas fa-eye text-warning fa-3x"></i>
+                            </div>
+                            <h3 class="cyber-text-glow">{{ stats.total_visits }}</h3>
+                            <p class="text-light mb-0">Total Visits</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="cyber-card h-100">
+                        <div class="card-body text-center">
+                            <div class="cyber-stat-icon mb-3">
+                                <i class="fas fa-map-marker-alt text-danger fa-3x"></i>
+                            </div>
+                            <h3 class="cyber-text-glow">{{ stats.total_locations }}</h3>
+                            <p class="text-light mb-0">Locations Captured</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Create New Session -->
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <div class="cyber-card">
+                        <div class="card-body">
+                            <h4 class="card-title text-cyan mb-4">
+                                <i class="fas fa-plus-circle"></i> Create New Tracking Session
+                            </h4>
+                            <form method="POST" action="{{ url_for('create_seeker_session') }}">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="session_name" class="form-label text-light">Session Name</label>
+                                            <input type="text" class="form-control cyber-input" id="session_name" name="session_name" 
+                                                   placeholder="Enter session name..." required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="template_name" class="form-label text-light">Template</label>
+                                            <select class="form-select cyber-input" id="template_name" name="template_name" required>
+                                                <option value="">Select a template...</option>
+                                                {% for template in templates %}
+                                                <option value="{{ template.get('dir_name', template.name.lower().replace(' ', '_')) }}">
+                                                    {{ template.name }}
+                                                </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <button type="submit" class="btn cyber-btn-primary">
+                                        <i class="fas fa-rocket"></i> Launch Session
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="cyber-card">
+                        <div class="card-body">
+                            <h5 class="card-title text-warning">
+                                <i class="fas fa-exclamation-triangle"></i> Warning
+                            </h5>
+                            <p class="text-light small mb-0">
+                                This tool is for educational purposes only. Use responsibly and only with proper 
+                                authorization. Misuse may violate privacy laws and regulations.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Sessions -->
+            {% if sessions %}
+            <div class="cyber-card">
+                <div class="card-body">
+                    <h4 class="card-title text-cyan mb-4">
+                        <i class="fas fa-history"></i> Recent Sessions
+                    </h4>
+                    <div class="table-responsive">
+                        <table class="table table-dark cyber-table">
+                            <thead>
+                                <tr>
+                                    <th>Session Name</th>
+                                    <th>Template</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Visits</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for session in sessions %}
+                                <tr>
+                                    <td>
+                                        <strong class="text-cyan">{{ session.name }}</strong>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ session.template_name|title }}</span>
+                                    </td>
+                                    <td>
+                                        {% if session.status == 'active' %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-play"></i> Active
+                                        </span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-pause"></i> Inactive
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-light">
+                                        {{ session.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-warning">{{ session.visits }}</span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('seeker_session_detail', session_id=session.id) }}" 
+                                           class="btn btn-sm cyber-btn-secondary me-1" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ url_for('toggle_seeker_session', session_id=session.id) }}" 
+                                           class="btn btn-sm btn-warning me-1" title="Toggle Status">
+                                            {% if session.status == 'active' %}
+                                            <i class="fas fa-pause"></i>
+                                            {% else %}
+                                            <i class="fas fa-play"></i>
+                                            {% endif %}
+                                        </a>
+                                        <a href="{{ url_for('delete_seeker_session', session_id=session.id) }}" 
+                                           class="btn btn-sm btn-danger" title="Delete Session"
+                                           onclick="return confirm('Are you sure you want to delete this session?')">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="cyber-card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <h4 class="text-light">No Sessions Found</h4>
+                    <p class="text-muted">Create your first tracking session to get started.</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

