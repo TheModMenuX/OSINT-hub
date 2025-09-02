@@ -1,215 +1,184 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - OSINT Intelligence Platform{% endblock %}
-
 {% block content %}
-<div class="container my-4">
-    <!-- Header Section -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="bg-dark p-4 rounded border border-secondary">
-                <h1 class="display-6 text-warning mb-3">
-                    <i class="fas fa-search-location me-3"></i>
-                    OSINT Intelligence Platform
+<div class="container">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <div class="cyber-hero">
+                <h1 class="display-4 fw-bold text-white mb-3">
+                    OSINT<span class="text-cyan">TOOLS</span>
                 </h1>
-                <p class="lead text-muted mb-0">
-                    Comprehensive Open Source Intelligence gathering and analysis tools for cybersecurity professionals
+                <p class="lead text-light mb-4">
+                    Comprehensive Open Source Intelligence Platform
                 </p>
+                <div class="cyber-stats">
+                    <span class="badge cyber-badge me-3">
+                        <i class="fas fa-search"></i> {{ total_searches_today }} Searches Today
+                    </span>
+                    <span class="badge cyber-badge">
+                        <i class="fas fa-shield-alt"></i> Secure & Anonymous
+                    </span>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Quick Actions -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <h3 class="text-warning mb-3">
-                <i class="fas fa-bolt me-2"></i>
-                Quick Actions
-            </h3>
-        </div>
-        
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-            <a href="{{ url_for('ip_lookup') }}" class="card bg-dark border-info text-decoration-none h-100">
-                <div class="card-body text-center">
-                    <i class="fas fa-globe fa-2x text-info mb-3"></i>
-                    <h6 class="card-title text-light">IP Geolocation</h6>
-                    <p class="card-text text-muted small">Track IP locations and gather intelligence</p>
+    <!-- Tools Grid -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-6 col-lg-4">
+            <div class="cyber-card h-100">
+                <div class="cyber-card-body text-center">
+                    <div class="cyber-icon mb-3">
+                        <i class="fas fa-user-search"></i>
+                    </div>
+                    <h5 class="cyber-card-title">Username Search</h5>
+                    <p class="cyber-card-text">
+                        Search for usernames across multiple social media platforms and websites.
+                    </p>
+                    <a href="{{ url_for('username_search') }}" class="btn cyber-btn">
+                        <i class="fas fa-arrow-right"></i> Start Search
+                    </a>
                 </div>
-            </a>
+            </div>
         </div>
-        
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-            <a href="{{ url_for('email_search') }}" class="card bg-dark border-success text-decoration-none h-100">
-                <div class="card-body text-center">
-                    <i class="fas fa-envelope fa-2x text-success mb-3"></i>
-                    <h6 class="card-title text-light">Email Search</h6>
-                    <p class="card-text text-muted small">Validate emails and find breaches</p>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="cyber-card h-100">
+                <div class="cyber-card-body text-center">
+                    <div class="cyber-icon mb-3">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <h5 class="cyber-card-title">Domain Analysis</h5>
+                    <p class="cyber-card-text">
+                        Comprehensive domain investigation including WHOIS, DNS, and subdomain enumeration.
+                    </p>
+                    <a href="{{ url_for('domain_analysis') }}" class="btn cyber-btn">
+                        <i class="fas fa-arrow-right"></i> Analyze Domain
+                    </a>
                 </div>
-            </a>
+            </div>
         </div>
-        
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-            <a href="{{ url_for('domain_analysis') }}" class="card bg-dark border-warning text-decoration-none h-100">
-                <div class="card-body text-center">
-                    <i class="fas fa-server fa-2x text-warning mb-3"></i>
-                    <h6 class="card-title text-light">Domain Analysis</h6>
-                    <p class="card-text text-muted small">WHOIS lookup and DNS analysis</p>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="cyber-card h-100">
+                <div class="cyber-card-body text-center">
+                    <div class="cyber-icon mb-3">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <h5 class="cyber-card-title">IP Investigation</h5>
+                    <p class="cyber-card-text">
+                        Investigate IP addresses for geolocation, ISP information, and open ports.
+                    </p>
+                    <a href="{{ url_for('ip_investigation') }}" class="btn cyber-btn">
+                        <i class="fas fa-arrow-right"></i> Investigate IP
+                    </a>
                 </div>
-            </a>
+            </div>
         </div>
-        
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-            <a href="{{ url_for('username_search') }}" class="card bg-dark border-primary text-decoration-none h-100">
-                <div class="card-body text-center">
-                    <i class="fas fa-user fa-2x text-primary mb-3"></i>
-                    <h6 class="card-title text-light">Username Search</h6>
-                    <p class="card-text text-muted small">Find profiles across platforms</p>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="cyber-card h-100">
+                <div class="cyber-card-body text-center">
+                    <div class="cyber-icon mb-3">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h5 class="cyber-card-title">Email/Phone Lookup</h5>
+                    <p class="cyber-card-text">
+                        Validate and investigate email addresses and phone numbers.
+                    </p>
+                    <a href="{{ url_for('email_phone_lookup') }}" class="btn cyber-btn">
+                        <i class="fas fa-arrow-right"></i> Start Lookup
+                    </a>
                 </div>
-            </a>
+            </div>
         </div>
-        
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-            <a href="{{ url_for('phone_lookup') }}" class="card bg-dark border-danger text-decoration-none h-100">
-                <div class="card-body text-center">
-                    <i class="fas fa-phone fa-2x text-danger mb-3"></i>
-                    <h6 class="card-title text-light">Phone Lookup</h6>
-                    <p class="card-text text-muted small">Analyze phone numbers and carriers</p>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="cyber-card h-100">
+                <div class="cyber-card-body text-center">
+                    <div class="cyber-icon mb-3">
+                        <i class="fas fa-spider"></i>
+                    </div>
+                    <h5 class="cyber-card-title">Web Scraper</h5>
+                    <p class="cyber-card-text">
+                        Extract and analyze content from websites for intelligence gathering.
+                    </p>
+                    <a href="{{ url_for('web_scraper') }}" class="btn cyber-btn">
+                        <i class="fas fa-arrow-right"></i> Scrape Website
+                    </a>
                 </div>
-            </a>
+            </div>
         </div>
-        
-        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-            <a href="{{ url_for('search_history') }}" class="card bg-dark border-secondary text-decoration-none h-100">
-                <div class="card-body text-center">
-                    <i class="fas fa-history fa-2x text-secondary mb-3"></i>
-                    <h6 class="card-title text-light">History</h6>
-                    <p class="card-text text-muted small">Review past investigations</p>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="cyber-card h-100">
+                <div class="cyber-card-body text-center">
+                    <div class="cyber-icon mb-3">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h5 class="cyber-card-title">Analytics</h5>
+                    <p class="cyber-card-text">
+                        View comprehensive analytics and statistics of your OSINT operations.
+                    </p>
+                    <a href="{{ url_for('analytics') }}" class="btn cyber-btn">
+                        <i class="fas fa-arrow-right"></i> View Analytics
+                    </a>
                 </div>
-            </a>
+            </div>
         </div>
     </div>
 
     <!-- Recent Activity -->
+    {% if recent_searches %}
     <div class="row">
-        <div class="col-lg-8 mb-4">
-            <div class="card bg-dark border-secondary">
-                <div class="card-header bg-secondary">
-                    <h5 class="mb-0">
-                        <i class="fas fa-clock me-2"></i>
-                        Recent Searches
-                    </h5>
-                </div>
-                <div class="card-body">
-                    {% if recent_searches %}
-                        <div class="list-group list-group-flush">
-                            {% for search in recent_searches %}
-                                <div class="list-group-item bg-dark border-secondary d-flex justify-content-between align-items-start">
-                                    <div class="ms-2 me-auto">
-                                        <div class="fw-bold text-light">
-                                            <i class="fas fa-search me-2"></i>
-                                            {{ search.search_type.title().replace('_', ' ') }}
-                                        </div>
-                                        <p class="mb-1 text-muted">{{ search.query }}</p>
-                                        <small class="text-muted">{{ search.timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
-                                    </div>
-                                    <span class="badge bg-secondary rounded-pill">
-                                        <i class="fas fa-eye"></i>
-                                    </span>
-                                </div>
-                            {% endfor %}
-                        </div>
-                        <div class="text-center mt-3">
-                            <a href="{{ url_for('search_history') }}" class="btn btn-outline-secondary">
-                                <i class="fas fa-history me-2"></i>
-                                View All History
-                            </a>
-                        </div>
-                    {% else %}
-                        <div class="text-center py-4">
-                            <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                            <p class="text-muted">No recent searches. Start your investigation above!</p>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-lg-4 mb-4">
-            <div class="card bg-dark border-secondary">
-                <div class="card-header bg-secondary">
-                    <h5 class="mb-0">
-                        <i class="fas fa-bookmark me-2"></i>
-                        Bookmarks
-                    </h5>
-                </div>
-                <div class="card-body">
-                    {% if bookmarks %}
-                        <div class="list-group list-group-flush">
-                            {% for bookmark in bookmarks %}
-                                <div class="list-group-item bg-dark border-secondary">
-                                    <div class="fw-bold text-warning">{{ bookmark.title }}</div>
-                                    <p class="mb-1 text-muted small">{{ bookmark.query }}</p>
-                                    <small class="text-muted">{{ bookmark.timestamp.strftime('%Y-%m-%d') }}</small>
-                                </div>
-                            {% endfor %}
-                        </div>
-                        <div class="text-center mt-3">
-                            <a href="{{ url_for('bookmarks') }}" class="btn btn-outline-warning">
-                                <i class="fas fa-bookmark me-2"></i>
-                                View All Bookmarks
-                            </a>
-                        </div>
-                    {% else %}
-                        <div class="text-center py-4">
-                            <i class="fas fa-bookmark fa-3x text-muted mb-3"></i>
-                            <p class="text-muted">No bookmarks yet. Save important findings!</p>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Features Overview -->
-    <div class="row mt-4">
         <div class="col-12">
-            <div class="card bg-dark border-secondary">
-                <div class="card-header bg-secondary">
+            <div class="cyber-card">
+                <div class="cyber-card-header">
                     <h5 class="mb-0">
-                        <i class="fas fa-info-circle me-2"></i>
-                        Platform Features
+                        <i class="fas fa-history text-cyan"></i> Recent Activity
                     </h5>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <h6 class="text-warning">
-                                <i class="fas fa-shield-alt me-2"></i>
-                                Security Features
-                            </h6>
-                            <ul class="list-unstyled text-muted">
-                                <li><i class="fas fa-check text-success me-2"></i>Rate limiting protection</li>
-                                <li><i class="fas fa-check text-success me-2"></i>Secure data handling</li>
-                                <li><i class="fas fa-check text-success me-2"></i>Privacy-focused design</li>
-                                <li><i class="fas fa-check text-success me-2"></i>Discord webhook alerts</li>
-                            </ul>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <h6 class="text-warning">
-                                <i class="fas fa-cogs me-2"></i>
-                                Advanced Capabilities
-                            </h6>
-                            <ul class="list-unstyled text-muted">
-                                <li><i class="fas fa-check text-success me-2"></i>Multi-platform searches</li>
-                                <li><i class="fas fa-check text-success me-2"></i>Comprehensive reporting</li>
-                                <li><i class="fas fa-check text-success me-2"></i>Export functionality</li>
-                                <li><i class="fas fa-check text-success me-2"></i>Investigation tracking</li>
-                            </ul>
-                        </div>
+                <div class="cyber-card-body">
+                    <div class="table-responsive">
+                        <table class="table cyber-table">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Query</th>
+                                    <th>Timestamp</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for search in recent_searches %}
+                                <tr>
+                                    <td>
+                                        <span class="badge cyber-badge-{{ search.search_type }}">
+                                            {{ search.search_type|title }}
+                                        </span>
+                                    </td>
+                                    <td>{{ search.query }}</td>
+                                    <td>{{ search.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                    <td>
+                                        <span class="badge cyber-badge-success">
+                                            <i class="fas fa-check"></i> Completed
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('history') }}" class="btn cyber-btn-outline">
+                            <i class="fas fa-history"></i> View Full History
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    {% endif %}
 </div>
 {% endblock %}

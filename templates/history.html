@@ -1,106 +1,156 @@
 {% extends "base.html" %}
 
-{% block title %}Search History - OSINT Platform{% endblock %}
+{% block title %}Search History - OSINT Tools{% endblock %}
 
 {% block content %}
-<div class="container my-4">
-    <!-- Header -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card bg-dark border-secondary">
-                <div class="card-header">
-                    <h3 class="mb-0">
-                        <i class="fas fa-history me-2"></i>
-                        Search History
-                    </h3>
-                </div>
-                <div class="card-body">
-                    <p class="text-muted mb-0">
-                        Track your OSINT investigations and research activities. Export or bookmark important findings.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Search History -->
+<div class="container">
     <div class="row">
         <div class="col-12">
-            <div class="card bg-dark border-secondary">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
-                        <i class="fas fa-clock me-2"></i>
-                        Recent Searches
-                    </h5>
-                    {% if searches %}
-                        <span class="badge bg-primary">{{ searches|length }} searches</span>
-                    {% endif %}
-                </div>
-                <div class="card-body">
-                    {% if searches %}
-                        <div class="table-responsive">
-                            <table class="table table-dark table-hover">
-                                <thead>
-                                    <tr>
-                                        <th><i class="fas fa-tag me-1"></i>Type</th>
-                                        <th><i class="fas fa-search me-1"></i>Query</th>
-                                        <th><i class="fas fa-clock me-1"></i>Date</th>
-                                        <th><i class="fas fa-network-wired me-1"></i>IP</th>
-                                        <th><i class="fas fa-cogs me-1"></i>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for search in searches %}
-                                        <tr>
-                                            <td>
-                                                <span class="badge bg-{{ 'info' if search.search_type == 'ip_lookup' else 'success' if search.search_type == 'email_search' else 'warning' if search.search_type == 'domain_analysis' else 'primary' if search.search_type == 'username_search' else 'danger' }}">
-                                                    {{ search.search_type.replace('_', ' ').title() }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <code class="text-light">{{ search.query }}</code>
-                                            </td>
-                                            <td>
-                                                <small class="text-muted">
-                                                    {{ search.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
-                                                </small>
-                                            </td>
-                                            <td>
-                                                <small class="text-muted">
-                                                    {{ search.ip_address or 'Unknown' }}
-                                                </small>
-                                            </td>
-                                            <td>
-                                                <div class="btn-group btn-group-sm">
-                                                    <a href="{{ url_for('export_results', search_id=search.id) }}" 
-                                                       class="btn btn-outline-info" 
-                                                       title="Export Results">
-                                                        <i class="fas fa-download"></i>
-                                                    </a>
-                                                    <button class="btn btn-outline-warning" 
-                                                            onclick="bookmarkSearch({{ search.id }}, '{{ search.search_type }}', '{{ search.query }}')"
-                                                            title="Bookmark">
-                                                        <i class="fas fa-bookmark"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+            <div class="cyber-card">
+                <div class="cyber-card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="mb-0">
+                            <i class="fas fa-history text-cyan"></i> Search History
+                        </h2>
+                        
+                        <!-- Filter -->
+                        <div class="filter-section">
+                            <form method="GET" class="d-flex align-items-center">
+                                <select name="type" class="form-select cyber-select me-2" onchange="this.form.submit()">
+                                    <option value="">All Types</option>
+                                    <option value="username" {% if search_type == 'username' %}selected{% endif %}>Username</option>
+                                    <option value="domain" {% if search_type == 'domain' %}selected{% endif %}>Domain</option>
+                                    <option value="ip" {% if search_type == 'ip' %}selected{% endif %}>IP</option>
+                                    <option value="email" {% if search_type == 'email' %}selected{% endif %}>Email</option>
+                                    <option value="phone" {% if search_type == 'phone' %}selected{% endif %}>Phone</option>
+                                    <option value="webscrape" {% if search_type == 'webscrape' %}selected{% endif %}>Web Scrape</option>
+                                </select>
+                            </form>
                         </div>
+                    </div>
+                </div>
+                
+                <div class="cyber-card-body">
+                    {% if searches.items %}
+                    <div class="table-responsive">
+                        <table class="table cyber-table">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Query</th>
+                                    <th>Timestamp</th>
+                                    <th>IP Address</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for search in searches.items %}
+                                <tr>
+                                    <td>
+                                        <span class="badge cyber-badge-{{ search.search_type }}">
+                                            {% if search.search_type == 'username' %}
+                                                <i class="fas fa-user-search"></i>
+                                            {% elif search.search_type == 'domain' %}
+                                                <i class="fas fa-globe"></i>
+                                            {% elif search.search_type == 'ip' %}
+                                                <i class="fas fa-network-wired"></i>
+                                            {% elif search.search_type == 'email' %}
+                                                <i class="fas fa-envelope"></i>
+                                            {% elif search.search_type == 'phone' %}
+                                                <i class="fas fa-phone"></i>
+                                            {% elif search.search_type == 'webscrape' %}
+                                                <i class="fas fa-spider"></i>
+                                            {% endif %}
+                                            {{ search.search_type|title }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <code class="cyber-code">{{ search.query|truncate(50) }}</code>
+                                    </td>
+                                    <td>{{ search.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                    <td>
+                                        <small class="text-muted">{{ search.ip_address or 'N/A' }}</small>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm cyber-btn-outline" 
+                                                onclick="viewSearchDetails({{ search.id }}, '{{ search.search_type }}', '{{ search.query }}', '{{ search.results|e }}')">
+                                            <i class="fas fa-eye"></i> View
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if searches.pages > 1 %}
+                    <nav aria-label="Search history pagination" class="mt-4">
+                        <ul class="pagination justify-content-center cyber-pagination">
+                            {% if searches.has_prev %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('history', page=searches.prev_num, type=search_type) }}">
+                                    <i class="fas fa-chevron-left"></i> Previous
+                                </a>
+                            </li>
+                            {% endif %}
+                            
+                            {% for page_num in searches.iter_pages() %}
+                                {% if page_num %}
+                                    {% if page_num != searches.page %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('history', page=page_num, type=search_type) }}">
+                                            {{ page_num }}
+                                        </a>
+                                    </li>
+                                    {% else %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ page_num }}</span>
+                                    </li>
+                                    {% endif %}
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if searches.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('history', page=searches.next_num, type=search_type) }}">
+                                    Next <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    
+                    <div class="text-center mt-3">
+                        <small class="text-muted">
+                            Showing {{ searches.per_page * (searches.page - 1) + 1 }} to 
+                            {{ searches.per_page * (searches.page - 1) + searches.items|length }} of 
+                            {{ searches.total }} entries
+                        </small>
+                    </div>
+                    {% endif %}
+                    
                     {% else %}
-                        <div class="text-center py-5">
-                            <i class="fas fa-search fa-4x text-muted mb-3"></i>
-                            <h5 class="text-muted">No searches in history</h5>
-                            <p class="text-muted">
-                                Start investigating to see your search history here.
+                    <div class="text-center py-5">
+                        <div class="empty-state">
+                            <i class="fas fa-history empty-state-icon"></i>
+                            <h5 class="empty-state-title">No Search History</h5>
+                            <p class="empty-state-text">
+                                {% if search_type %}
+                                No {{ search_type }} searches found.
+                                {% else %}
+                                You haven't performed any searches yet.
+                                {% endif %}
                             </p>
-                            <a href="{{ url_for('index') }}" class="btn btn-primary">
-                                <i class="fas fa-plus me-2"></i>
-                                Start Investigating
+                            <a href="{{ url_for('index') }}" class="btn cyber-btn">
+                                <i class="fas fa-search"></i> Start Searching
                             </a>
                         </div>
+                    </div>
                     {% endif %}
                 </div>
             </div>
@@ -108,34 +158,62 @@
     </div>
 </div>
 
+<!-- Search Details Modal -->
+<div class="modal fade" id="searchDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content cyber-modal">
+            <div class="modal-header cyber-modal-header">
+                <h5 class="modal-title" id="searchDetailsModalLabel">
+                    <i class="fas fa-search"></i> Search Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body cyber-modal-body">
+                <div id="searchDetailsContent">
+                    <!-- Content will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer cyber-modal-footer">
+                <button type="button" class="btn cyber-btn-outline" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-function bookmarkSearch(searchId, searchType, query) {
-    const title = prompt(`Enter bookmark title for ${searchType}:`, `${searchType}: ${query}`);
-    if (title) {
-        fetch('/bookmark', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                title: title,
-                search_type: searchType,
-                query: query,
-                results: '{}', // Would need to fetch actual results
-                notes: ''
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Bookmark added successfully!');
-            } else {
-                alert('Error adding bookmark: ' + data.message);
-            }
-        })
-        .catch(error => {
-            alert('Error: ' + error);
-        });
+function viewSearchDetails(id, type, query, results) {
+    try {
+        const resultsData = JSON.parse(results.replace(/&#34;/g, '"'));
+        
+        let content = `
+            <div class="search-details">
+                <div class="mb-3">
+                    <span class="badge cyber-badge-${type}">
+                        ${type.charAt(0).toUpperCase() + type.slice(1)}
+                    </span>
+                    <h6 class="mt-2">Query: <code class="cyber-code">${query}</code></h6>
+                </div>
+                <div class="results-container">
+                    <pre class="cyber-pre">${JSON.stringify(resultsData, null, 2)}</pre>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('searchDetailsContent').innerHTML = content;
+        document.getElementById('searchDetailsModalLabel').innerHTML = 
+            `<i class="fas fa-search"></i> ${type.charAt(0).toUpperCase() + type.slice(1)} Search Details`;
+        
+        const modal = new bootstrap.Modal(document.getElementById('searchDetailsModal'));
+        modal.show();
+    } catch (e) {
+        console.error('Error parsing search results:', e);
+        document.getElementById('searchDetailsContent').innerHTML = 
+            '<div class="alert alert-danger">Error loading search details</div>';
+        
+        const modal = new bootstrap.Modal(document.getElementById('searchDetailsModal'));
+        modal.show();
     }
 }
 </script>

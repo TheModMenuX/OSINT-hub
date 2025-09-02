@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}IP Investigation - OSINT Tools{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="cyber-card">
+                <div class="cyber-card-header text-center">
+                    <h2 class="mb-0">
+                        <i class="fas fa-network-wired text-cyan"></i> IP Investigation
+                    </h2>
+                    <p class="text-light mt-2">Investigate IP addresses for geolocation and network information</p>
+                </div>
+                
+                <div class="cyber-card-body">
+                    <form method="POST" class="mb-4">
+                        <div class="input-group cyber-input-group">
+                            <span class="input-group-text cyber-input-addon">
+                                <i class="fas fa-server"></i>
+                            </span>
+                            <input type="text" class="form-control cyber-input" 
+                                   name="ip_address" placeholder="Enter IP address (e.g., 8.8.8.8)" 
+                                   value="{{ ip_address or '' }}" required>
+                            <button class="btn cyber-btn" type="submit">
+                                <i class="fas fa-search"></i> Investigate
+                            </button>
+                        </div>
+                    </form>
+
+                    {% if results %}
+                    <div class="results-section">
+                        <h4 class="text-cyan mb-4">
+                            <i class="fas fa-magnifying-glass"></i> Investigation Results for "{{ ip_address }}"
+                        </h4>
+                        
+                        {% if results.error %}
+                        <div class="alert alert-danger cyber-alert">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Error: {{ results.error }}
+                        </div>
+                        {% else %}
+                        <div class="row g-4">
+                            <!-- Basic Information -->
+                            <div class="col-lg-6">
+                                <div class="info-card">
+                                    <h5 class="info-card-title">
+                                        <i class="fas fa-info-circle"></i> Basic Information
+                                    </h5>
+                                    <div class="info-card-body">
+                                        <div class="info-row">
+                                            <span class="info-label">IP Address:</span>
+                                            <span class="info-value">{{ results.ip_address }}</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Hostname:</span>
+                                            <span class="info-value">{{ results.hostname or 'N/A' }}</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Type:</span>
+                                            <span class="info-value">
+                                                <span class="badge cyber-badge">IPv4</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Geolocation -->
+                            {% if results.geolocation and not results.geolocation.get('error') %}
+                            <div class="col-lg-6">
+                                <div class="info-card">
+                                    <h5 class="info-card-title">
+                                        <i class="fas fa-map-marker-alt"></i> Geolocation
+                                    </h5>
+                                    <div class="info-card-body">
+                                        <div class="info-row">
+                                            <span class="info-label">Country:</span>
+                                            <span class="info-value">{{ results.geolocation.country }}</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Region:</span>
+                                            <span class="info-value">{{ results.geolocation.region }}</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">City:</span>
+                                            <span class="info-value">{{ results.geolocation.city }}</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">ISP:</span>
+                                            <span class="info-value">{{ results.geolocation.isp }}</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Organization:</span>
+                                            <span class="info-value">{{ results.geolocation.org }}</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Timezone:</span>
+                                            <span class="info-value">{{ results.geolocation.timezone }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Open Ports -->
+                            {% if results.open_ports %}
+                            <div class="col-12">
+                                <div class="info-card">
+                                    <h5 class="info-card-title">
+                                        <i class="fas fa-door-open"></i> Open Ports
+                                    </h5>
+                                    <div class="info-card-body">
+                                        <div class="row">
+                                            {% for port in results.open_ports %}
+                                            <div class="col-md-3 col-lg-2 mb-2">
+                                                <div class="port-item">
+                                                    <span class="badge cyber-badge-success">
+                                                        <i class="fas fa-door-open"></i> {{ port }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        {% if results.open_ports|length == 0 %}
+                                        <p class="text-muted">No open ports detected (common ports scanned)</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Security Information -->
+                            <div class="col-12">
+                                <div class="info-card">
+                                    <h5 class="info-card-title">
+                                        <i class="fas fa-shield-alt"></i> Security Notes
+                                    </h5>
+                                    <div class="info-card-body">
+                                        <div class="alert alert-info cyber-alert">
+                                            <i class="fas fa-info-circle"></i>
+                                            This tool performs basic reconnaissance. Always ensure you have proper authorization before conducting any security testing.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="mt-4 text-center">
+                            <small class="text-muted">
+                                <i class="fas fa-clock"></i> 
+                                Investigation completed at {{ results.timestamp }}
+                            </small>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

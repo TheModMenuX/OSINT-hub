@@ -1,690 +1,666 @@
-/* OSINT Intelligence Platform - Main JavaScript */
+/**
+ * OSINT Tools - Cyber Intelligence Platform
+ * Main JavaScript file for interactive elements and animations
+ */
 
-// Global variables
-let searchInProgress = false;
-let searchTimeout;
-
-// Initialize when DOM is loaded
+// Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
-    initializeApp();
+    console.log('🔮 OSINT Tools - Cyber Interface Initialized');
+    
+    // Initialize all components
+    initializeMatrixBackground();
+    initializeCyberEffects();
+    initializeFormEnhancements();
+    initializeAnimations();
+    initializeTooltips();
+    initializeParticleEffects();
 });
 
 /**
- * Initialize the application
+ * Matrix Background Animation
  */
-function initializeApp() {
-    console.log('🔍 OSINT Platform initialized');
-    
-    // Initialize tooltips
-    initializeTooltips();
-    
-    // Initialize form validations
-    initializeFormValidation();
-    
-    // Initialize search functionality
-    initializeSearchHandlers();
-    
-    // Initialize keyboard shortcuts
-    initializeKeyboardShortcuts();
-    
-    // Initialize theme handlers
-    initializeThemeHandlers();
-    
-    // Initialize notification system
-    initializeNotifications();
-    
-    // Initialize clipboard functionality
-    initializeClipboard();
-    
-    // Add loading states to forms
-    initializeLoadingStates();
-    
-    // Initialize auto-save for forms
-    initializeAutoSave();
-    
-    // Initialize dark mode persistence
-    initializeDarkMode();
-}
+function initializeMatrixBackground() {
+    const matrixBg = document.getElementById('matrix-bg');
+    if (!matrixBg) return;
 
-/**
- * Initialize Bootstrap tooltips
- */
-function initializeTooltips() {
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function(tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-}
-
-/**
- * Enhanced form validation
- */
-function initializeFormValidation() {
-    const forms = document.querySelectorAll('.needs-validation');
+    // Create canvas for matrix effect
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
     
-    Array.from(forms).forEach(form => {
-        form.addEventListener('submit', event => {
-            if (!form.checkValidity()) {
-                event.preventDefault();
-                event.stopPropagation();
-                
-                // Focus on first invalid field
-                const firstInvalid = form.querySelector(':invalid');
-                if (firstInvalid) {
-                    firstInvalid.focus();
-                    firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-            }
-            
-            form.classList.add('was-validated');
-        }, false);
+    canvas.style.position = 'fixed';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvas.style.zIndex = '-1';
+    canvas.style.opacity = '0.1';
+    canvas.style.pointerEvents = 'none';
+    
+    matrixBg.appendChild(canvas);
+
+    // Matrix characters
+    const matrix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%+-/~{[|`]}";
+    const matrixArray = matrix.split("");
+
+    let font_size = 14;
+    let columns = 0;
+    let drops = [];
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        columns = canvas.width / font_size;
         
-        // Real-time validation
-        const inputs = form.querySelectorAll('input, textarea, select');
-        inputs.forEach(input => {
-            input.addEventListener('blur', function() {
-                validateField(this);
-            });
-            
-            input.addEventListener('input', function() {
-                if (this.classList.contains('is-invalid')) {
-                    validateField(this);
-                }
-            });
-        });
-    });
-}
-
-/**
- * Validate individual form field
- */
-function validateField(field) {
-    if (field.checkValidity()) {
-        field.classList.remove('is-invalid');
-        field.classList.add('is-valid');
-    } else {
-        field.classList.remove('is-valid');
-        field.classList.add('is-invalid');
+        // Reset drops array
+        drops = [];
+        for(let x = 0; x < columns; x++) {
+            drops[x] = 1;
+        }
     }
-}
 
-/**
- * Initialize search handlers with enhanced UX
- */
-function initializeSearchHandlers() {
-    const searchForms = document.querySelectorAll('form[method="POST"]');
-    
-    searchForms.forEach(form => {
-        form.addEventListener('submit', function(e) {
-            const submitBtn = form.querySelector('button[type="submit"]');
-            if (submitBtn && !form.classList.contains('was-validated') || form.checkValidity()) {
-                showSearchProgress(submitBtn);
+    function drawMatrix() {
+        // Semi-transparent black background
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Green text
+        ctx.fillStyle = '#00ff00';
+        ctx.font = font_size + 'px monospace';
+
+        for(let i = 0; i < drops.length; i++) {
+            const text = matrixArray[Math.floor(Math.random() * matrixArray.length)];
+            ctx.fillText(text, i * font_size, drops[i] * font_size);
+
+            if(drops[i] * font_size > canvas.height && Math.random() > 0.975) {
+                drops[i] = 0;
             }
+            drops[i]++;
+        }
+    }
+
+    // Initialize canvas
+    resizeCanvas();
+    
+    // Start matrix animation
+    setInterval(drawMatrix, 35);
+    
+    // Handle window resize
+    window.addEventListener('resize', resizeCanvas);
+}
+
+/**
+ * Cyber Effects - Glowing and hover animations
+ */
+function initializeCyberEffects() {
+    // Add glow effect to important elements
+    const glowElements = document.querySelectorAll('.cyber-btn, .cyber-brand, .cyber-icon, .stat-number');
+    
+    glowElements.forEach(element => {
+        element.addEventListener('mouseenter', function() {
+            this.style.filter = 'drop-shadow(0 0 10px currentColor)';
+            this.style.transform = 'scale(1.05)';
+        });
+        
+        element.addEventListener('mouseleave', function() {
+            this.style.filter = '';
+            this.style.transform = '';
         });
     });
+
+    // Cyber typing effect for headers
+    const typeElements = document.querySelectorAll('h1, h2');
+    typeElements.forEach(element => {
+        if (element.dataset.typed !== 'true') {
+            typeWriterEffect(element);
+            element.dataset.typed = 'true';
+        }
+    });
+
+    // Add scanning line effect to cards
+    addScanningEffect();
+
+    // Initialize cyber grid effects
+    initializeCyberGrid();
 }
 
 /**
- * Show search progress with enhanced UX
+ * Typewriter Effect
  */
-function showSearchProgress(button) {
-    if (searchInProgress) return;
+function typeWriterEffect(element) {
+    const text = element.textContent;
+    element.textContent = '';
+    element.style.borderRight = '2px solid #00ffff';
     
-    searchInProgress = true;
-    const originalText = button.innerHTML;
-    const loadingText = '<i class="fas fa-spinner fa-spin me-2"></i>Analyzing...';
-    
-    button.innerHTML = loadingText;
-    button.disabled = true;
-    button.classList.add('scanning');
-    
-    // Add progress bar if not exists
-    let progressBar = document.querySelector('.search-progress');
-    if (!progressBar) {
-        progressBar = document.createElement('div');
-        progressBar.className = 'progress mt-3 search-progress';
-        progressBar.innerHTML = '<div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>';
-        button.parentNode.appendChild(progressBar);
-    }
-    
-    // Animate progress
-    animateProgress(progressBar.querySelector('.progress-bar'));
-    
-    // Reset after timeout (fallback)
-    searchTimeout = setTimeout(() => {
-        resetSearchProgress(button, originalText, progressBar);
-    }, 30000);
-}
-
-/**
- * Animate progress bar
- */
-function animateProgress(progressBar) {
-    let width = 0;
-    const interval = setInterval(() => {
-        if (width >= 90) {
-            clearInterval(interval);
+    let i = 0;
+    const timer = setInterval(() => {
+        if (i < text.length) {
+            element.textContent += text.charAt(i);
+            i++;
         } else {
-            width += Math.random() * 10;
-            progressBar.style.width = Math.min(width, 90) + '%';
+            clearInterval(timer);
+            // Remove cursor after typing
+            setTimeout(() => {
+                element.style.borderRight = 'none';
+            }, 1000);
         }
-    }, 500);
+    }, 50);
 }
 
 /**
- * Reset search progress
+ * Scanning Line Effect
  */
-function resetSearchProgress(button, originalText, progressBar) {
-    searchInProgress = false;
-    button.innerHTML = originalText;
-    button.disabled = false;
-    button.classList.remove('scanning');
+function addScanningEffect() {
+    const cards = document.querySelectorAll('.cyber-card, .info-card, .stat-card');
     
-    if (progressBar) {
-        progressBar.remove();
-    }
-    
-    if (searchTimeout) {
-        clearTimeout(searchTimeout);
-    }
-}
-
-/**
- * Initialize keyboard shortcuts
- */
-function initializeKeyboardShortcuts() {
-    document.addEventListener('keydown', function(e) {
-        // Ctrl+/ or Cmd+/ - Focus search
-        if ((e.ctrlKey || e.metaKey) && e.key === '/') {
-            e.preventDefault();
-            const searchInput = document.querySelector('input[type="text"], input[type="email"], input[type="tel"]');
-            if (searchInput) {
-                searchInput.focus();
-                showNotification('Search focused', 'info');
-            }
-        }
-        
-        // Escape - Clear focus and close modals
-        if (e.key === 'Escape') {
-            document.activeElement.blur();
-            const modals = document.querySelectorAll('.modal.show');
-            modals.forEach(modal => {
-                const bsModal = bootstrap.Modal.getInstance(modal);
-                if (bsModal) bsModal.hide();
-            });
-        }
-        
-        // Ctrl+Enter - Submit form
-        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-            const form = document.querySelector('form:not([data-no-shortcut])');
-            if (form) {
-                form.requestSubmit();
-            }
-        }
-    });
-}
-
-/**
- * Initialize theme handlers
- */
-function initializeThemeHandlers() {
-    // Add theme toggle if needed
-    const themeToggle = document.querySelector('#theme-toggle');
-    if (themeToggle) {
-        themeToggle.addEventListener('click', function() {
-            const currentTheme = document.documentElement.getAttribute('data-bs-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-bs-theme', newTheme);
-            localStorage.setItem('osint-theme', newTheme);
-            showNotification(`Switched to ${newTheme} theme`, 'info');
-        });
-    }
-}
-
-/**
- * Initialize notification system
- */
-function initializeNotifications() {
-    // Create notification container if not exists
-    if (!document.querySelector('.notification-container')) {
-        const container = document.createElement('div');
-        container.className = 'notification-container position-fixed top-0 end-0 p-3';
-        container.style.zIndex = '9999';
-        document.body.appendChild(container);
-    }
-}
-
-/**
- * Show notification
- */
-function showNotification(message, type = 'info', duration = 3000) {
-    const container = document.querySelector('.notification-container');
-    if (!container) return;
-    
-    const notification = document.createElement('div');
-    notification.className = `alert alert-${type} alert-dismissible fade show`;
-    notification.innerHTML = `
-        <i class="fas fa-${getIconForType(type)} me-2"></i>
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-    
-    container.appendChild(notification);
-    
-    // Auto-dismiss
-    setTimeout(() => {
-        if (notification.parentNode) {
-            const bsAlert = new bootstrap.Alert(notification);
-            bsAlert.close();
-        }
-    }, duration);
-}
-
-/**
- * Get icon for notification type
- */
-function getIconForType(type) {
-    const icons = {
-        'success': 'check-circle',
-        'info': 'info-circle',
-        'warning': 'exclamation-triangle',
-        'danger': 'exclamation-circle',
-        'error': 'exclamation-circle'
-    };
-    return icons[type] || 'info-circle';
-}
-
-/**
- * Initialize clipboard functionality
- */
-function initializeClipboard() {
-    // Add click-to-copy functionality to code blocks
-    const codeBlocks = document.querySelectorAll('pre code, code');
-    codeBlocks.forEach(block => {
-        if (block.textContent.length > 10) {
-            block.style.cursor = 'pointer';
-            block.title = 'Click to copy';
-            
-            block.addEventListener('click', function() {
-                copyToClipboard(this.textContent.trim());
-            });
-        }
-    });
-    
-    // Add copy buttons to results
-    const resultCards = document.querySelectorAll('.card-body');
-    resultCards.forEach(card => {
-        const copyBtn = document.createElement('button');
-        copyBtn.className = 'btn btn-outline-secondary btn-sm position-absolute top-0 end-0 m-2';
-        copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
-        copyBtn.title = 'Copy results';
-        copyBtn.style.zIndex = '10';
-        
-        if (card.style.position !== 'relative') {
-            card.style.position = 'relative';
-        }
-        
-        copyBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const text = extractTextFromElement(card);
-            copyToClipboard(text);
-        });
-        
-        card.appendChild(copyBtn);
-    });
-}
-
-/**
- * Copy text to clipboard
- */
-async function copyToClipboard(text) {
-    try {
-        await navigator.clipboard.writeText(text);
-        showNotification('Copied to clipboard', 'success', 2000);
-    } catch (err) {
-        // Fallback for older browsers
-        const textArea = document.createElement('textarea');
-        textArea.value = text;
-        textArea.style.position = 'fixed';
-        textArea.style.opacity = '0';
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        
-        try {
-            document.execCommand('copy');
-            showNotification('Copied to clipboard', 'success', 2000);
-        } catch (fallbackErr) {
-            showNotification('Failed to copy', 'error', 2000);
-        }
-        
-        document.body.removeChild(textArea);
-    }
-}
-
-/**
- * Extract clean text from element
- */
-function extractTextFromElement(element) {
-    const clone = element.cloneNode(true);
-    // Remove buttons and non-essential elements
-    const buttons = clone.querySelectorAll('button, .btn');
-    buttons.forEach(btn => btn.remove());
-    
-    return clone.textContent.trim().replace(/\s+/g, ' ');
-}
-
-/**
- * Initialize loading states
- */
-function initializeLoadingStates() {
-    const cards = document.querySelectorAll('.card');
     cards.forEach(card => {
         card.addEventListener('mouseenter', function() {
-            this.classList.add('glow');
-        });
-        
-        card.addEventListener('mouseleave', function() {
-            this.classList.remove('glow');
-        });
-    });
-}
-
-/**
- * Initialize auto-save functionality for forms
- */
-function initializeAutoSave() {
-    const forms = document.querySelectorAll('form');
-    forms.forEach(form => {
-        const inputs = form.querySelectorAll('input, textarea, select');
-        inputs.forEach(input => {
-            // Load saved value
-            const savedValue = localStorage.getItem(`osint-form-${input.name || input.id}`);
-            if (savedValue && input.type !== 'password') {
-                input.value = savedValue;
-            }
-            
-            // Save on input
-            input.addEventListener('input', function() {
-                if (this.type !== 'password' && (this.name || this.id)) {
-                    localStorage.setItem(`osint-form-${this.name || this.id}`, this.value);
-                }
-            });
-        });
-        
-        // Clear saved values on successful submit
-        form.addEventListener('submit', function() {
-            if (this.checkValidity()) {
-                const inputs = this.querySelectorAll('input, textarea, select');
-                inputs.forEach(input => {
-                    if (input.name || input.id) {
-                        localStorage.removeItem(`osint-form-${input.name || input.id}`);
+            if (!this.querySelector('.scan-line')) {
+                const scanLine = document.createElement('div');
+                scanLine.className = 'scan-line';
+                scanLine.style.cssText = `
+                    position: absolute;
+                    top: 0;
+                    left: -100%;
+                    width: 100%;
+                    height: 2px;
+                    background: linear-gradient(90deg, transparent, #00ffff, transparent);
+                    animation: scan 1.5s ease-in-out;
+                    z-index: 10;
+                `;
+                
+                this.style.position = 'relative';
+                this.style.overflow = 'hidden';
+                this.appendChild(scanLine);
+                
+                // Remove scan line after animation
+                setTimeout(() => {
+                    if (scanLine.parentNode) {
+                        scanLine.parentNode.removeChild(scanLine);
                     }
-                });
+                }, 1500);
             }
         });
     });
-}
 
-/**
- * Initialize dark mode persistence
- */
-function initializeDarkMode() {
-    const savedTheme = localStorage.getItem('osint-theme');
-    if (savedTheme) {
-        document.documentElement.setAttribute('data-bs-theme', savedTheme);
+    // Add CSS for scan animation
+    if (!document.querySelector('#scan-style')) {
+        const style = document.createElement('style');
+        style.id = 'scan-style';
+        style.textContent = `
+            @keyframes scan {
+                0% { left: -100%; }
+                100% { left: 100%; }
+            }
+        `;
+        document.head.appendChild(style);
     }
 }
 
 /**
- * Utility function to format timestamps
+ * Cyber Grid Effect
  */
-function formatTimestamp(timestamp) {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diff = now - date;
+function initializeCyberGrid() {
+    const body = document.body;
     
-    if (diff < 60000) { // Less than 1 minute
-        return 'Just now';
-    } else if (diff < 3600000) { // Less than 1 hour
-        return `${Math.floor(diff / 60000)} minutes ago`;
-    } else if (diff < 86400000) { // Less than 1 day
-        return `${Math.floor(diff / 3600000)} hours ago`;
-    } else {
-        return date.toLocaleDateString();
-    }
-}
-
-/**
- * Utility function to validate IP address
- */
-function isValidIP(ip) {
-    const ipRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-    return ipRegex.test(ip);
-}
-
-/**
- * Utility function to validate email
- */
-function isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-}
-
-/**
- * Utility function to validate domain
- */
-function isValidDomain(domain) {
-    const domainRegex = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
-    return domainRegex.test(domain);
-}
-
-/**
- * Enhanced search functionality with suggestions
- */
-function initializeSearchSuggestions() {
-    const searchInputs = document.querySelectorAll('input[type="text"]:not([data-no-suggestions])');
+    // Create grid overlay
+    const gridOverlay = document.createElement('div');
+    gridOverlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: 
+            linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+        background-size: 50px 50px;
+        pointer-events: none;
+        z-index: -2;
+        opacity: 0.5;
+    `;
     
-    searchInputs.forEach(input => {
-        let suggestionTimeout;
-        
-        input.addEventListener('input', function() {
-            clearTimeout(suggestionTimeout);
-            suggestionTimeout = setTimeout(() => {
-                showSearchSuggestions(this);
-            }, 300);
+    body.appendChild(gridOverlay);
+}
+
+/**
+ * Form Enhancements
+ */
+function initializeFormEnhancements() {
+    // Add focus effects to inputs
+    const inputs = document.querySelectorAll('.cyber-input');
+    
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.style.boxShadow = '0 0 15px rgba(0, 255, 255, 0.3)';
         });
         
         input.addEventListener('blur', function() {
+            this.parentElement.style.boxShadow = '';
+        });
+
+        // Add typing sound effect (visual)
+        input.addEventListener('input', function() {
+            this.style.borderColor = '#00ff00';
             setTimeout(() => {
-                hideSuggestions(this);
+                this.style.borderColor = '';
             }, 200);
         });
     });
-}
 
-/**
- * Show search suggestions
- */
-function showSearchSuggestions(input) {
-    const value = input.value.trim();
-    if (value.length < 2) {
-        hideSuggestions(input);
-        return;
-    }
-    
-    let suggestions = [];
-    
-    // Generate suggestions based on input type and value
-    if (input.name === 'ip_address') {
-        if (isValidIP(value)) {
-            suggestions = ['Analyze this IP address'];
-        } else {
-            suggestions = ['8.8.8.8', '1.1.1.1', '208.67.222.222'];
-        }
-    } else if (input.name === 'email') {
-        if (value.includes('@')) {
-            suggestions = ['Validate this email', 'Check for breaches'];
-        } else {
-            suggestions = [`${value}@gmail.com`, `${value}@yahoo.com`, `${value}@outlook.com`];
-        }
-    } else if (input.name === 'domain') {
-        suggestions = [`${value}.com`, `${value}.org`, `${value}.net`];
-    } else if (input.name === 'username') {
-        suggestions = ['Search across all platforms', 'Check social media'];
-    }
-    
-    displaySuggestions(input, suggestions);
-}
+    // Enhanced form validation
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            const inputs = this.querySelectorAll('input[required]');
+            let isValid = true;
 
-/**
- * Display suggestions dropdown
- */
-function displaySuggestions(input, suggestions) {
-    hideSuggestions(input);
-    
-    if (suggestions.length === 0) return;
-    
-    const dropdown = document.createElement('div');
-    dropdown.className = 'suggestion-dropdown position-absolute bg-dark border border-secondary rounded mt-1 w-100';
-    dropdown.style.zIndex = '1000';
-    dropdown.style.maxHeight = '200px';
-    dropdown.style.overflowY = 'auto';
-    
-    suggestions.forEach(suggestion => {
-        const item = document.createElement('div');
-        item.className = 'suggestion-item p-2 text-light cursor-pointer';
-        item.textContent = suggestion;
-        item.style.cursor = 'pointer';
-        
-        item.addEventListener('mouseenter', function() {
-            this.style.backgroundColor = 'rgba(255, 193, 7, 0.1)';
-        });
-        
-        item.addEventListener('mouseleave', function() {
-            this.style.backgroundColor = 'transparent';
-        });
-        
-        item.addEventListener('click', function() {
-            input.value = suggestion;
-            hideSuggestions(input);
-            input.focus();
-        });
-        
-        dropdown.appendChild(item);
-    });
-    
-    input.parentNode.style.position = 'relative';
-    input.parentNode.appendChild(dropdown);
-}
+            inputs.forEach(input => {
+                if (!input.value.trim()) {
+                    isValid = false;
+                    input.style.borderColor = '#ff0040';
+                    input.style.boxShadow = '0 0 10px rgba(255, 0, 64, 0.5)';
+                    
+                    // Show error message
+                    showCyberMessage('Please fill in all required fields', 'error');
+                } else {
+                    input.style.borderColor = '';
+                    input.style.boxShadow = '';
+                }
+            });
 
-/**
- * Hide suggestions dropdown
- */
-function hideSuggestions(input) {
-    const existing = input.parentNode.querySelector('.suggestion-dropdown');
-    if (existing) {
-        existing.remove();
-    }
-}
-
-/**
- * Initialize result animations
- */
-function initializeResultAnimations() {
-    const results = document.querySelectorAll('.fade-in');
-    results.forEach((result, index) => {
-        result.style.animationDelay = `${index * 0.1}s`;
-    });
-}
-
-/**
- * Export functionality enhancement
- */
-function enhancedExport(data, filename, format = 'json') {
-    let content, mimeType, extension;
-    
-    switch (format.toLowerCase()) {
-        case 'csv':
-            content = convertToCSV(data);
-            mimeType = 'text/csv';
-            extension = 'csv';
-            break;
-        case 'txt':
-            content = convertToText(data);
-            mimeType = 'text/plain';
-            extension = 'txt';
-            break;
-        default:
-            content = JSON.stringify(data, null, 2);
-            mimeType = 'application/json';
-            extension = 'json';
-    }
-    
-    const blob = new Blob([content], { type: mimeType });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    
-    link.href = url;
-    link.download = `${filename}.${extension}`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    
-    showNotification(`Results exported as ${extension.toUpperCase()}`, 'success');
-}
-
-/**
- * Convert data to CSV format
- */
-function convertToCSV(data) {
-    // Simple CSV conversion - can be enhanced based on data structure
-    const headers = Object.keys(data).join(',');
-    const values = Object.values(data).map(val => 
-        typeof val === 'object' ? JSON.stringify(val) : val
-    ).join(',');
-    
-    return `${headers}\n${values}`;
-}
-
-/**
- * Convert data to readable text format
- */
-function convertToText(data) {
-    let text = '';
-    
-    function processObject(obj, indent = 0) {
-        const spaces = ' '.repeat(indent);
-        for (const [key, value] of Object.entries(obj)) {
-            if (typeof value === 'object' && value !== null) {
-                text += `${spaces}${key}:\n`;
-                processObject(value, indent + 2);
+            if (!isValid) {
+                e.preventDefault();
             } else {
-                text += `${spaces}${key}: ${value}\n`;
+                // Show loading state
+                const submitBtn = this.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    const originalText = submitBtn.innerHTML;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                    submitBtn.disabled = true;
+                    
+                    // Re-enable after a delay (in case form doesn't redirect)
+                    setTimeout(() => {
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                    }, 5000);
+                }
+            }
+        });
+    });
+}
+
+/**
+ * Animations and Transitions
+ */
+function initializeAnimations() {
+    // Intersection Observer for scroll animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+
+    // Observe cards and important elements
+    const animatedElements = document.querySelectorAll('.cyber-card, .stat-card, .info-card');
+    animatedElements.forEach((el, index) => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
+        observer.observe(el);
+    });
+
+    // Parallax effect for hero section
+    const heroSection = document.querySelector('.cyber-hero');
+    if (heroSection) {
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const parallax = scrolled * 0.5;
+            heroSection.style.transform = `translateY(${parallax}px)`;
+        });
+    }
+
+    // Floating animation for icons
+    const icons = document.querySelectorAll('.cyber-icon');
+    icons.forEach((icon, index) => {
+        icon.style.animation = `float 3s ease-in-out infinite ${index * 0.5}s`;
+    });
+
+    // Add floating animation CSS
+    if (!document.querySelector('#float-style')) {
+        const style = document.createElement('style');
+        style.id = 'float-style';
+        style.textContent = `
+            @keyframes float {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-10px); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+}
+
+/**
+ * Tooltips
+ */
+function initializeTooltips() {
+    // Create custom cyber tooltips
+    const elementsWithTooltips = document.querySelectorAll('[title]');
+    
+    elementsWithTooltips.forEach(element => {
+        const tooltipText = element.getAttribute('title');
+        element.removeAttribute('title'); // Remove default tooltip
+        
+        element.addEventListener('mouseenter', function(e) {
+            const tooltip = document.createElement('div');
+            tooltip.className = 'cyber-tooltip';
+            tooltip.textContent = tooltipText;
+            tooltip.style.cssText = `
+                position: absolute;
+                background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+                color: #00ffff;
+                padding: 8px 12px;
+                border-radius: 6px;
+                border: 1px solid #333;
+                font-size: 12px;
+                font-family: 'Orbitron', monospace;
+                z-index: 1000;
+                pointer-events: none;
+                box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+                transform: translateY(-100%);
+                margin-top: -10px;
+            `;
+            
+            document.body.appendChild(tooltip);
+            
+            const rect = this.getBoundingClientRect();
+            tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2) + 'px';
+            tooltip.style.top = rect.top + window.scrollY + 'px';
+        });
+        
+        element.addEventListener('mouseleave', function() {
+            const tooltip = document.querySelector('.cyber-tooltip');
+            if (tooltip) {
+                tooltip.remove();
+            }
+        });
+    });
+}
+
+/**
+ * Particle Effects
+ */
+function initializeParticleEffects() {
+    // Create particle system for background
+    const particleContainer = document.createElement('div');
+    particleContainer.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -3;
+    `;
+    document.body.appendChild(particleContainer);
+
+    // Create particles
+    for (let i = 0; i < 50; i++) {
+        createParticle(particleContainer);
+    }
+}
+
+function createParticle(container) {
+    const particle = document.createElement('div');
+    particle.style.cssText = `
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        background: #00ffff;
+        border-radius: 50%;
+        opacity: ${Math.random() * 0.5 + 0.2};
+        animation: particleFloat ${Math.random() * 10 + 10}s linear infinite;
+    `;
+    
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.top = Math.random() * 100 + '%';
+    particle.style.animationDelay = Math.random() * 10 + 's';
+    
+    container.appendChild(particle);
+
+    // Add particle animation CSS if not exists
+    if (!document.querySelector('#particle-style')) {
+        const style = document.createElement('style');
+        style.id = 'particle-style';
+        style.textContent = `
+            @keyframes particleFloat {
+                0% { 
+                    transform: translateY(0) translateX(0) scale(1);
+                    opacity: 0;
+                }
+                10% {
+                    opacity: 1;
+                }
+                90% {
+                    opacity: 1;
+                }
+                100% { 
+                    transform: translateY(-100vh) translateX(${Math.random() * 200 - 100}px) scale(0);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+}
+
+/**
+ * Cyber Message System
+ */
+function showCyberMessage(message, type = 'info') {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `cyber-message cyber-message-${type}`;
+    messageDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+        border: 1px solid ${type === 'error' ? '#ff0040' : '#00ffff'};
+        border-left: 4px solid ${type === 'error' ? '#ff0040' : '#00ffff'};
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        font-family: 'Rajdhani', sans-serif;
+        font-weight: 500;
+        box-shadow: 0 0 20px rgba(${type === 'error' ? '255, 0, 64' : '0, 255, 255'}, 0.3);
+        z-index: 9999;
+        transform: translateX(400px);
+        transition: transform 0.3s ease;
+        max-width: 350px;
+    `;
+    
+    messageDiv.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-${type === 'error' ? 'exclamation-triangle' : 'info-circle'}"></i>
+            <span>${message}</span>
+            <button onclick="this.parentElement.parentElement.remove()" 
+                    style="background: none; border: none; color: white; font-size: 18px; cursor: pointer; margin-left: auto;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(messageDiv);
+    
+    // Animate in
+    setTimeout(() => {
+        messageDiv.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        messageDiv.style.transform = 'translateX(400px)';
+        setTimeout(() => {
+            if (messageDiv.parentNode) {
+                messageDiv.parentNode.removeChild(messageDiv);
+            }
+        }, 300);
+    }, 5000);
+}
+
+/**
+ * Search Result Animations
+ */
+function animateSearchResults() {
+    const resultItems = document.querySelectorAll('.platform-card, .info-row');
+    
+    resultItems.forEach((item, index) => {
+        item.style.opacity = '0';
+        item.style.transform = 'translateX(-20px)';
+        item.style.transition = `opacity 0.4s ease ${index * 0.1}s, transform 0.4s ease ${index * 0.1}s`;
+        
+        setTimeout(() => {
+            item.style.opacity = '1';
+            item.style.transform = 'translateX(0)';
+        }, index * 100);
+    });
+}
+
+/**
+ * Terminal-style Console Output
+ */
+function initializeTerminalOutput() {
+    // Add terminal-style logging for debugging
+    const originalLog = console.log;
+    console.log = function(...args) {
+        originalLog.apply(console, ['[OSINT-TOOLS]', ...args]);
+    };
+    
+    // Add cyber-themed console styling
+    console.log('%c🔮 OSINT Tools Initialized', 'color: #00ffff; font-weight: bold; font-size: 14px;');
+    console.log('%c⚡ Cyber Interface Active', 'color: #00ff00; font-weight: bold;');
+    console.log('%c🛡️ Security Protocols Enabled', 'color: #ff00ff; font-weight: bold;');
+}
+
+/**
+ * Keyboard Shortcuts
+ */
+function initializeKeyboardShortcuts() {
+    document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + K for search focus
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            const searchInput = document.querySelector('input[name="username"], input[name="domain"], input[name="ip_address"], input[name="query"], input[name="url"]');
+            if (searchInput) {
+                searchInput.focus();
+                showCyberMessage('Search activated - Start typing', 'info');
             }
         }
-    }
-    
-    processObject(data);
-    return text;
+        
+        // Escape to clear all inputs
+        if (e.key === 'Escape') {
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                if (input.type !== 'submit' && input.type !== 'button') {
+                    input.value = '';
+                }
+            });
+            document.activeElement.blur();
+        }
+    });
 }
 
-// Initialize additional functionality when needed
-setTimeout(() => {
-    initializeSearchSuggestions();
-    initializeResultAnimations();
-}, 1000);
+/**
+ * Performance Monitoring
+ */
+function initializePerformanceMonitoring() {
+    // Monitor page load performance
+    window.addEventListener('load', function() {
+        const loadTime = performance.now();
+        console.log(`⚡ Page loaded in ${Math.round(loadTime)}ms`);
+        
+        if (loadTime > 3000) {
+            console.warn('⚠️ Slow page load detected');
+        }
+    });
+    
+    // Monitor search operations
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function() {
+            const startTime = performance.now();
+            console.log('🔍 Search operation started');
+            
+            // This would normally be handled by server response
+            // but we can log client-side timing
+            setTimeout(() => {
+                const endTime = performance.now();
+                console.log(`🔍 Search completed in ${Math.round(endTime - startTime)}ms`);
+            }, 1000);
+        });
+    });
+}
 
-// Global error handler
-window.addEventListener('error', function(e) {
-    console.error('OSINT Platform Error:', e.error);
-    showNotification('An unexpected error occurred', 'error');
+// Initialize additional features
+document.addEventListener('DOMContentLoaded', function() {
+    initializeTerminalOutput();
+    initializeKeyboardShortcuts();
+    initializePerformanceMonitoring();
+    
+    // Animate search results if they exist
+    if (document.querySelector('.results-section')) {
+        animateSearchResults();
+    }
 });
 
-// Prevent form resubmission on refresh
-if (window.history.replaceState) {
-    window.history.replaceState(null, null, window.location.href);
-}
+// Global utility functions
+window.CyberUtils = {
+    showMessage: showCyberMessage,
+    animateResults: animateSearchResults,
+    typeWriter: typeWriterEffect
+};
 
-console.log('🎯 OSINT Platform fully loaded and ready');
+// Add some fun Easter eggs
+document.addEventListener('keydown', function(e) {
+    // Konami code for special effect
+    const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'];
+    window.konamiSequence = window.konamiSequence || [];
+    
+    window.konamiSequence.push(e.code);
+    if (window.konamiSequence.length > konamiCode.length) {
+        window.konamiSequence = window.konamiSequence.slice(-konamiCode.length);
+    }
+    
+    if (JSON.stringify(window.konamiSequence) === JSON.stringify(konamiCode)) {
+        // Special cyber effect
+        document.body.style.animation = 'cyber-glitch 2s ease-in-out';
+        showCyberMessage('🔮 Cyber Mode Activated! Welcome to the Matrix...', 'info');
+        
+        // Add glitch effect CSS
+        if (!document.querySelector('#glitch-style')) {
+            const style = document.createElement('style');
+            style.id = 'glitch-style';
+            style.textContent = `
+                @keyframes cyber-glitch {
+                    0%, 100% { filter: none; }
+                    20% { filter: hue-rotate(90deg) saturate(5); }
+                    40% { filter: invert(1) hue-rotate(180deg); }
+                    60% { filter: sepia(1) hue-rotate(270deg); }
+                    80% { filter: contrast(2) brightness(0.5); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        window.konamiSequence = [];
+    }
+});
+
+console.log('%c🚀 OSINT Tools JavaScript Loaded Successfully!', 'color: #00ffff; font-weight: bold; font-size: 16px;');

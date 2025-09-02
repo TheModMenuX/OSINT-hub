@@ -1,158 +1,155 @@
 {% extends "base.html" %}
 
-{% block title %}Domain Analysis - OSINT Platform{% endblock %}
+{% block title %}Domain Analysis - OSINT Tools{% endblock %}
 
 {% block content %}
-<div class="container my-4">
+<div class="container">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <!-- Header -->
-            <div class="card bg-dark border-warning mb-4">
-                <div class="card-header bg-warning text-dark">
-                    <h3 class="mb-0">
-                        <i class="fas fa-server me-2"></i>
-                        Domain Analysis & WHOIS
-                    </h3>
+        <div class="col-lg-10">
+            <div class="cyber-card">
+                <div class="cyber-card-header text-center">
+                    <h2 class="mb-0">
+                        <i class="fas fa-globe text-cyan"></i> Domain Analysis
+                    </h2>
+                    <p class="text-light mt-2">Comprehensive domain investigation and analysis</p>
                 </div>
-                <div class="card-body">
-                    <p class="text-muted mb-0">
-                        Comprehensive domain investigation including WHOIS data, DNS records, subdomain discovery,
-                        and security analysis. Essential for digital forensics and reconnaissance.
-                    </p>
-                </div>
-            </div>
-
-            <!-- Search Form -->
-            <div class="card bg-dark border-secondary">
-                <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="fas fa-search me-2"></i>
-                        Domain Investigation
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <form method="POST" class="needs-validation" novalidate>
-                        <div class="mb-3">
-                            <label for="domain" class="form-label text-light">
-                                <i class="fas fa-globe me-2"></i>
-                                Domain Name
-                            </label>
-                            <input 
-                                type="text" 
-                                class="form-control bg-dark border-secondary text-light" 
-                                id="domain" 
-                                name="domain" 
-                                placeholder="Enter domain (e.g., example.com)"
-                                pattern="^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*$"
-                                required
-                            >
-                            <div class="invalid-feedback">
-                                Please enter a valid domain name.
-                            </div>
-                            <div class="form-text text-muted">
-                                <i class="fas fa-info-circle me-1"></i>
-                                Enter a domain name without http:// or www. (e.g., google.com)
-                            </div>
-                        </div>
-
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-warning" id="searchBtn">
-                                <i class="fas fa-search me-2"></i>
-                                Analyze Domain
+                
+                <div class="cyber-card-body">
+                    <form method="POST" class="mb-4">
+                        <div class="input-group cyber-input-group">
+                            <span class="input-group-text cyber-input-addon">
+                                <i class="fas fa-globe"></i>
+                            </span>
+                            <input type="text" class="form-control cyber-input" 
+                                   name="domain" placeholder="Enter domain (e.g., example.com)" 
+                                   value="{{ domain or '' }}" required>
+                            <button class="btn cyber-btn" type="submit">
+                                <i class="fas fa-search"></i> Analyze
                             </button>
                         </div>
                     </form>
-                </div>
-            </div>
 
-            <!-- Quick Examples -->
-            <div class="card bg-dark border-secondary mt-4">
-                <div class="card-header">
-                    <h6 class="mb-0">
-                        <i class="fas fa-lightbulb me-2"></i>
-                        Example Domains
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <p class="text-muted mb-2">Try analyzing these domains:</p>
-                    <div class="d-flex flex-wrap gap-2">
-                        <button class="btn btn-outline-warning btn-sm" onclick="fillDomain('google.com')">
-                            google.com
-                        </button>
-                        <button class="btn btn-outline-warning btn-sm" onclick="fillDomain('github.com')">
-                            github.com
-                        </button>
-                        <button class="btn btn-outline-warning btn-sm" onclick="fillDomain('stackoverflow.com')">
-                            stackoverflow.com
-                        </button>
-                    </div>
-                </div>
-            </div>
+                    {% if results %}
+                    <div class="results-section">
+                        <h4 class="text-cyan mb-4">
+                            <i class="fas fa-chart-bar"></i> Analysis Results for "{{ domain }}"
+                        </h4>
+                        
+                        <div class="row g-4">
+                            <!-- Basic Information -->
+                            <div class="col-lg-6">
+                                <div class="info-card">
+                                    <h5 class="info-card-title">
+                                        <i class="fas fa-info-circle"></i> Basic Information
+                                    </h5>
+                                    <div class="info-card-body">
+                                        <div class="info-row">
+                                            <span class="info-label">Domain:</span>
+                                            <span class="info-value">{{ results.domain }}</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">IP Address:</span>
+                                            <span class="info-value">{{ results.ip_address or 'N/A' }}</span>
+                                        </div>
+                                        {% if results.http_status %}
+                                        <div class="info-row">
+                                            <span class="info-label">HTTP Status:</span>
+                                            <span class="info-value">
+                                                {% if results.http_status == 'Unreachable' %}
+                                                    <span class="badge cyber-badge-danger">{{ results.http_status }}</span>
+                                                {% else %}
+                                                    <span class="badge cyber-badge-success">{{ results.http_status }}</span>
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                        {% endif %}
+                                        {% if results.server %}
+                                        <div class="info-row">
+                                            <span class="info-label">Server:</span>
+                                            <span class="info-value">{{ results.server }}</span>
+                                        </div>
+                                        {% endif %}
+                                        {% if results.ssl %}
+                                        <div class="info-row">
+                                            <span class="info-label">SSL:</span>
+                                            <span class="info-value">
+                                                <span class="badge cyber-badge-success">
+                                                    <i class="fas fa-lock"></i> Enabled
+                                                </span>
+                                            </span>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
 
-            <!-- Analysis Features -->
-            <div class="card bg-dark border-info mt-4">
-                <div class="card-header bg-info text-dark">
-                    <h6 class="mb-0">
-                        <i class="fas fa-cogs me-2"></i>
-                        Analysis Capabilities
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6 class="text-info">WHOIS Information</h6>
-                            <ul class="list-unstyled text-muted small">
-                                <li><i class="fas fa-user text-primary me-2"></i>Registrant details</li>
-                                <li><i class="fas fa-calendar text-success me-2"></i>Registration dates</li>
-                                <li><i class="fas fa-building text-warning me-2"></i>Registrar information</li>
-                                <li><i class="fas fa-server text-info me-2"></i>Name servers</li>
-                            </ul>
+                            <!-- WHOIS Information -->
+                            <div class="col-lg-6">
+                                <div class="info-card">
+                                    <h5 class="info-card-title">
+                                        <i class="fas fa-file-alt"></i> WHOIS Information
+                                    </h5>
+                                    <div class="info-card-body">
+                                        {% if results.whois %}
+                                            {% for key, value in results.whois.items() %}
+                                            <div class="info-row">
+                                                <span class="info-label">{{ key|title }}:</span>
+                                                <span class="info-value">{{ value }}</span>
+                                            </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p class="text-muted">WHOIS data not available</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Subdomains -->
+                            {% if results.subdomains %}
+                            <div class="col-12">
+                                <div class="info-card">
+                                    <h5 class="info-card-title">
+                                        <i class="fas fa-sitemap"></i> Discovered Subdomains
+                                    </h5>
+                                    <div class="info-card-body">
+                                        <div class="row">
+                                            {% for subdomain in results.subdomains %}
+                                            <div class="col-md-6 col-lg-4 mb-2">
+                                                <div class="subdomain-item">
+                                                    <i class="fas fa-link text-cyan"></i>
+                                                    <a href="http://{{ subdomain }}" target="_blank" class="subdomain-link">
+                                                        {{ subdomain }}
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if results.error %}
+                            <div class="col-12">
+                                <div class="alert alert-danger cyber-alert">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    Error: {{ results.error }}
+                                </div>
+                            </div>
+                            {% endif %}
                         </div>
-                        <div class="col-md-6">
-                            <h6 class="text-info">Technical Analysis</h6>
-                            <ul class="list-unstyled text-muted small">
-                                <li><i class="fas fa-network-wired text-primary me-2"></i>DNS record enumeration</li>
-                                <li><i class="fas fa-sitemap text-success me-2"></i>Subdomain discovery</li>
-                                <li><i class="fas fa-shield-alt text-danger me-2"></i>Security assessment</li>
-                                <li><i class="fas fa-file-alt text-secondary me-2"></i>Content analysis</li>
-                            </ul>
+
+                        <div class="mt-4 text-center">
+                            <small class="text-muted">
+                                <i class="fas fa-clock"></i> 
+                                Analysis completed at {{ results.timestamp }}
+                            </small>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Security Warning -->
-            <div class="alert alert-danger d-flex align-items-center mt-4" role="alert">
-                <i class="fas fa-exclamation-triangle me-2"></i>
-                <div>
-                    <strong>Legal Notice:</strong> Domain analysis should only be performed on domains you own 
-                    or have explicit permission to investigate. Respect privacy and legal boundaries.
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-function fillDomain(domain) {
-    document.getElementById('domain').value = domain;
-}
-
-// Form validation
-(function() {
-    'use strict';
-    window.addEventListener('load', function() {
-        var forms = document.getElementsByClassName('needs-validation');
-        var validation = Array.prototype.filter.call(forms, function(form) {
-            form.addEventListener('submit', function(event) {
-                if (form.checkValidity() === false) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                form.classList.add('was-validated');
-            }, false);
-        });
-    }, false);
-})();
-</script>
 {% endblock %}

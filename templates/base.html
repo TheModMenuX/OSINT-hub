@@ -1,25 +1,26 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}OSINT Tool{% endblock %}</title>
+    <title>{% block title %}OSINT Tools - Cyber Intelligence Platform{% endblock %}</title>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome Icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Custom Dark Theme CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dark-theme.css') }}">
-    
-    {% block extra_css %}{% endblock %}
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body class="bg-dark text-light">
+<body>
+    <!-- Matrix background effect -->
+    <div id="matrix-bg"></div>
+    
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary border-bottom border-secondary">
+    <nav class="navbar navbar-expand-lg navbar-dark cyber-nav">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="{{ url_for('dashboard.index') }}">
-                <i class="fas fa-search me-2"></i>OSINT Tool
+            <a class="navbar-brand cyber-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-terminal"></i> OSINT<span class="text-cyan">TOOLS</span>
             </a>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -29,76 +30,76 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('dashboard.index') }}">
-                            <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                        <a class="nav-link cyber-link" href="{{ url_for('index') }}">
+                            <i class="fas fa-home"></i> Dashboard
                         </a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-search me-1"></i>OSINT Search
+                        <a class="nav-link dropdown-toggle cyber-link" href="#" id="toolsDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-tools"></i> OSINT Tools
                         </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ url_for('osint.username_search') }}">
-                                <i class="fas fa-user me-2"></i>Username Search
+                        <ul class="dropdown-menu cyber-dropdown">
+                            <li><a class="dropdown-item cyber-dropdown-item" href="{{ url_for('username_search') }}">
+                                <i class="fas fa-user-search"></i> Username Search
                             </a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('osint.domain_search') }}">
-                                <i class="fas fa-globe me-2"></i>Domain Search
+                            <li><a class="dropdown-item cyber-dropdown-item" href="{{ url_for('domain_analysis') }}">
+                                <i class="fas fa-globe"></i> Domain Analysis
                             </a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('osint.email_search') }}">
-                                <i class="fas fa-envelope me-2"></i>Email Search
+                            <li><a class="dropdown-item cyber-dropdown-item" href="{{ url_for('ip_investigation') }}">
+                                <i class="fas fa-network-wired"></i> IP Investigation
+                            </a></li>
+                            <li><a class="dropdown-item cyber-dropdown-item" href="{{ url_for('email_phone_lookup') }}">
+                                <i class="fas fa-envelope"></i> Email/Phone Lookup
+                            </a></li>
+                            <li><a class="dropdown-item cyber-dropdown-item" href="{{ url_for('web_scraper') }}">
+                                <i class="fas fa-spider"></i> Web Scraper
                             </a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('phishing.templates') }}">
-                            <i class="fas fa-file-code me-1"></i>Phishing Templates
+                        <a class="nav-link cyber-link" href="{{ url_for('analytics') }}">
+                            <i class="fas fa-chart-line"></i> Analytics
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('analytics.dashboard') }}">
-                            <i class="fas fa-chart-bar me-1"></i>Analytics
+                        <a class="nav-link cyber-link" href="{{ url_for('history') }}">
+                            <i class="fas fa-history"></i> History
                         </a>
                     </li>
                 </ul>
-                
-                <span class="navbar-text">
-                    <i class="fas fa-shield-alt me-1"></i>Security Testing Tool
-                </span>
             </div>
         </div>
     </nav>
 
-    <!-- Flash Messages -->
+    <!-- Flash messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             <div class="container mt-3">
                 {% for category, message in messages %}
-                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show">
+                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show cyber-alert" role="alert">
                         {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
                     </div>
                 {% endfor %}
             </div>
         {% endif %}
     {% endwith %}
 
-    <!-- Main Content -->
+    <!-- Main content -->
     <main class="container-fluid py-4">
         {% block content %}{% endblock %}
     </main>
 
     <!-- Footer -->
-    <footer class="bg-secondary text-center py-3 mt-5">
+    <footer class="cyber-footer text-center py-3 mt-5">
         <div class="container">
-            <p class="mb-0">&copy; 2025 OSINT Tool - For Educational and Security Testing Purposes Only</p>
+            <p class="mb-0">&copy; 2025 OSINT Tools - <span class="text-cyan">Cyber Intelligence Platform</span></p>
         </div>
     </footer>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Chart.js for analytics -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    {% block extra_js %}{% endblock %}
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

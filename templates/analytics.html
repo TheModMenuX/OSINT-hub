@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - OSINT Tools{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="cyber-card">
+                <div class="cyber-card-header text-center">
+                    <h2 class="mb-0">
+                        <i class="fas fa-chart-line text-cyan"></i> Analytics Dashboard
+                    </h2>
+                    <p class="text-light mt-2">Comprehensive analytics and statistics</p>
+                </div>
+                
+                <div class="cyber-card-body">
+                    <!-- Summary Stats -->
+                    <div class="row g-4 mb-5">
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3 class="stat-number">{{ total_searches }}</h3>
+                                    <p class="stat-label">Total Searches</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-user-search"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3 class="stat-number">
+                                        {% set username_count = search_types|selectattr('0', 'equalto', 'username')|first %}
+                                        {{ username_count[1] if username_count else 0 }}
+                                    </h3>
+                                    <p class="stat-label">Username Searches</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-globe"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3 class="stat-number">
+                                        {% set domain_count = search_types|selectattr('0', 'equalto', 'domain')|first %}
+                                        {{ domain_count[1] if domain_count else 0 }}
+                                    </h3>
+                                    <p class="stat-label">Domain Analyses</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-network-wired"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3 class="stat-number">
+                                        {% set ip_count = search_types|selectattr('0', 'equalto', 'ip')|first %}
+                                        {{ ip_count[1] if ip_count else 0 }}
+                                    </h3>
+                                    <p class="stat-label">IP Investigations</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Row -->
+                    <div class="row g-4">
+                        <!-- Search Types Distribution -->
+                        <div class="col-lg-6">
+                            <div class="chart-card">
+                                <h5 class="chart-title">
+                                    <i class="fas fa-pie-chart"></i> Search Types Distribution
+                                </h5>
+                                <div class="chart-container">
+                                    <canvas id="searchTypesChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Activity Timeline -->
+                        <div class="col-lg-6">
+                            <div class="chart-card">
+                                <h5 class="chart-title">
+                                    <i class="fas fa-chart-line"></i> Recent Activity (Last 7 Days)
+                                </h5>
+                                <div class="chart-container">
+                                    <canvas id="activityChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Statistics -->
+                    <div class="row g-4 mt-4">
+                        <div class="col-12">
+                            <div class="info-card">
+                                <h5 class="info-card-title">
+                                    <i class="fas fa-list"></i> Detailed Statistics
+                                </h5>
+                                <div class="info-card-body">
+                                    <div class="table-responsive">
+                                        <table class="table cyber-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Search Type</th>
+                                                    <th>Total Count</th>
+                                                    <th>Percentage</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for search_type, count in search_types %}
+                                                <tr>
+                                                    <td>
+                                                        <span class="badge cyber-badge-{{ search_type }}">
+                                                            {{ search_type|title }}
+                                                        </span>
+                                                    </td>
+                                                    <td>{{ count }}</td>
+                                                    <td>
+                                                        {% set percentage = (count / total_searches * 100) if total_searches > 0 else 0 %}
+                                                        <div class="progress cyber-progress">
+                                                            <div class="progress-bar" style="width: {{ percentage }}%"></div>
+                                                        </div>
+                                                        {{ "%.1f"|format(percentage) }}%
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge cyber-badge-success">
+                                                            <i class="fas fa-check"></i> Active
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                                {% if not search_types %}
+                                                <tr>
+                                                    <td colspan="4" class="text-center text-muted">
+                                                        No search data available yet
+                                                    </td>
+                                                </tr>
+                                                {% endif %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Search Types Pie Chart
+const searchTypesCtx = document.getElementById('searchTypesChart').getContext('2d');
+const searchTypesData = {
+    labels: [{% for search_type, count in search_types %}'{{ search_type|title }}'{% if not loop.last %},{% endif %}{% endfor %}],
+    datasets: [{
+        data: [{% for search_type, count in search_types %}{{ count }}{% if not loop.last %},{% endif %}{% endfor %}],
+        backgroundColor: [
+            '#00ffff',
+            '#00ff00',
+            '#ff00ff',
+            '#ffff00',
+            '#ff8800',
+            '#8800ff'
+        ],
+        borderColor: '#1a1a1a',
+        borderWidth: 2
+    }]
+};
+
+new Chart(searchTypesCtx, {
+    type: 'doughnut',
+    data: searchTypesData,
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    color: '#ffffff',
+                    font: {
+                        family: 'Orbitron'
+                    }
+                }
+            }
+        }
+    }
+});
+
+// Activity Timeline Chart
+const activityCtx = document.getElementById('activityChart').getContext('2d');
+const activityData = {
+    labels: [{% for activity in recent_activity %}'{{ activity.date }}'{% if not loop.last %},{% endif %}{% endfor %}],
+    datasets: [{
+        label: 'Daily Searches',
+        data: [{% for activity in recent_activity %}{{ activity.count }}{% if not loop.last %},{% endif %}{% endfor %}],
+        borderColor: '#00ffff',
+        backgroundColor: 'rgba(0, 255, 255, 0.1)',
+        borderWidth: 2,
+        fill: true,
+        tension: 0.4
+    }]
+};
+
+new Chart(activityCtx, {
+    type: 'line',
+    data: activityData,
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    color: '#ffffff',
+                    font: {
+                        family: 'Orbitron'
+                    }
+                },
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.1)'
+                }
+            },
+            x: {
+                ticks: {
+                    color: '#ffffff',
+                    font: {
+                        family: 'Orbitron'
+                    }
+                },
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.1)'
+                }
+            }
+        },
+        plugins: {
+            legend: {
+                labels: {
+                    color: '#ffffff',
+                    font: {
+                        family: 'Orbitron'
+                    }
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

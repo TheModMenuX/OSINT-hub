@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}Email/Phone Lookup - OSINT Tools{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="cyber-card">
+                <div class="cyber-card-header text-center">
+                    <h2 class="mb-0">
+                        <i class="fas fa-envelope text-cyan"></i> Email/Phone Lookup
+                    </h2>
+                    <p class="text-light mt-2">Validate and investigate email addresses and phone numbers</p>
+                </div>
+                
+                <div class="cyber-card-body">
+                    <form method="POST" class="mb-4">
+                        <div class="mb-3">
+                            <label class="form-label text-light">Lookup Type:</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="type" id="email" value="email" checked>
+                                <label class="btn cyber-btn-outline" for="email">
+                                    <i class="fas fa-envelope"></i> Email
+                                </label>
+                                
+                                <input type="radio" class="btn-check" name="type" id="phone" value="phone">
+                                <label class="btn cyber-btn-outline" for="phone">
+                                    <i class="fas fa-phone"></i> Phone
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="input-group cyber-input-group">
+                            <span class="input-group-text cyber-input-addon">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" class="form-control cyber-input" 
+                                   name="query" placeholder="Enter email or phone number" 
+                                   value="{{ query or '' }}" required>
+                            <button class="btn cyber-btn" type="submit">
+                                <i class="fas fa-search"></i> Lookup
+                            </button>
+                        </div>
+                    </form>
+
+                    {% if results %}
+                    <div class="results-section">
+                        <h4 class="text-cyan mb-4">
+                            <i class="fas fa-list-ul"></i> Lookup Results for "{{ query }}"
+                        </h4>
+                        
+                        {% if results.error %}
+                        <div class="alert alert-danger cyber-alert">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Error: {{ results.error }}
+                        </div>
+                        {% else %}
+                        
+                        {% if lookup_type == 'email' %}
+                        <!-- Email Results -->
+                        <div class="row g-4">
+                            <div class="col-lg-6">
+                                <div class="info-card">
+                                    <h5 class="info-card-title">
+                                        <i class="fas fa-envelope"></i> Email Validation
+                                    </h5>
+                                    <div class="info-card-body">
+                                        <div class="info-row">
+                                            <span class="info-label">Email:</span>
+                                            <span class="info-value">{{ results.email }}</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Format Valid:</span>
+                                            <span class="info-value">
+                                                {% if results.valid_format %}
+                                                    <span class="badge cyber-badge-success">
+                                                        <i class="fas fa-check"></i> Valid
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge cyber-badge-danger">
+                                                        <i class="fas fa-times"></i> Invalid
+                                                    </span>
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Domain:</span>
+                                            <span class="info-value">{{ results.domain or 'N/A' }}</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Domain Exists:</span>
+                                            <span class="info-value">
+                                                {% if results.domain_exists %}
+                                                    <span class="badge cyber-badge-success">
+                                                        <i class="fas fa-check"></i> Yes
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge cyber-badge-danger">
+                                                        <i class="fas fa-times"></i> No
+                                                    </span>
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Disposable:</span>
+                                            <span class="info-value">
+                                                {% if results.is_disposable %}
+                                                    <span class="badge cyber-badge-warning">
+                                                        <i class="fas fa-exclamation"></i> Yes
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge cyber-badge-success">
+                                                        <i class="fas fa-check"></i> No
+                                                    </span>
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-6">
+                                <div class="info-card">
+                                    <h5 class="info-card-title">
+                                        <i class="fas fa-users"></i> Social Presence
+                                    </h5>
+                                    <div class="info-card-body">
+                                        {% if results.social_presence %}
+                                            {% for key, value in results.social_presence.items() %}
+                                            <div class="info-row">
+                                                <span class="info-label">{{ key|title }}:</span>
+                                                <span class="info-value">{{ value }}</span>
+                                            </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p class="text-muted">No social presence data available</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% elif lookup_type == 'phone' %}
+                        <!-- Phone Results -->
+                        <div class="row g-4">
+                            <div class="col-lg-8 mx-auto">
+                                <div class="info-card">
+                                    <h5 class="info-card-title">
+                                        <i class="fas fa-phone"></i> Phone Number Analysis
+                                    </h5>
+                                    <div class="info-card-body">
+                                        <div class="info-row">
+                                            <span class="info-label">Original:</span>
+                                            <span class="info-value">{{ results.phone }}</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Cleaned:</span>
+                                            <span class="info-value">{{ results.clean_phone or 'N/A' }}</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Formatted:</span>
+                                            <span class="info-value">{{ results.formatted or 'N/A' }}</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Valid:</span>
+                                            <span class="info-value">
+                                                {% if results.valid %}
+                                                    <span class="badge cyber-badge-success">
+                                                        <i class="fas fa-check"></i> Valid
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge cyber-badge-danger">
+                                                        <i class="fas fa-times"></i> Invalid
+                                                    </span>
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Country:</span>
+                                            <span class="info-value">{{ results.country or 'Unknown' }}</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <span class="info-label">Carrier:</span>
+                                            <span class="info-value">{{ results.carrier or 'Unknown' }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% endif %}
+
+                        <div class="mt-4 text-center">
+                            <small class="text-muted">
+                                <i class="fas fa-clock"></i> 
+                                Lookup completed at {{ results.timestamp }}
+                            </small>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
