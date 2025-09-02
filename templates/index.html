@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - OSINT Intelligence Platform{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="bg-dark p-4 rounded border border-secondary">
+                <h1 class="display-6 text-warning mb-3">
+                    <i class="fas fa-search-location me-3"></i>
+                    OSINT Intelligence Platform
+                </h1>
+                <p class="lead text-muted mb-0">
+                    Comprehensive Open Source Intelligence gathering and analysis tools for cybersecurity professionals
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="text-warning mb-3">
+                <i class="fas fa-bolt me-2"></i>
+                Quick Actions
+            </h3>
+        </div>
+        
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <a href="{{ url_for('ip_lookup') }}" class="card bg-dark border-info text-decoration-none h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-globe fa-2x text-info mb-3"></i>
+                    <h6 class="card-title text-light">IP Geolocation</h6>
+                    <p class="card-text text-muted small">Track IP locations and gather intelligence</p>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <a href="{{ url_for('email_search') }}" class="card bg-dark border-success text-decoration-none h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-envelope fa-2x text-success mb-3"></i>
+                    <h6 class="card-title text-light">Email Search</h6>
+                    <p class="card-text text-muted small">Validate emails and find breaches</p>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <a href="{{ url_for('domain_analysis') }}" class="card bg-dark border-warning text-decoration-none h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-server fa-2x text-warning mb-3"></i>
+                    <h6 class="card-title text-light">Domain Analysis</h6>
+                    <p class="card-text text-muted small">WHOIS lookup and DNS analysis</p>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <a href="{{ url_for('username_search') }}" class="card bg-dark border-primary text-decoration-none h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-user fa-2x text-primary mb-3"></i>
+                    <h6 class="card-title text-light">Username Search</h6>
+                    <p class="card-text text-muted small">Find profiles across platforms</p>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <a href="{{ url_for('phone_lookup') }}" class="card bg-dark border-danger text-decoration-none h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-phone fa-2x text-danger mb-3"></i>
+                    <h6 class="card-title text-light">Phone Lookup</h6>
+                    <p class="card-text text-muted small">Analyze phone numbers and carriers</p>
+                </div>
+            </a>
+        </div>
+        
+        <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+            <a href="{{ url_for('search_history') }}" class="card bg-dark border-secondary text-decoration-none h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-history fa-2x text-secondary mb-3"></i>
+                    <h6 class="card-title text-light">History</h6>
+                    <p class="card-text text-muted small">Review past investigations</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            <div class="card bg-dark border-secondary">
+                <div class="card-header bg-secondary">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clock me-2"></i>
+                        Recent Searches
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_searches %}
+                        <div class="list-group list-group-flush">
+                            {% for search in recent_searches %}
+                                <div class="list-group-item bg-dark border-secondary d-flex justify-content-between align-items-start">
+                                    <div class="ms-2 me-auto">
+                                        <div class="fw-bold text-light">
+                                            <i class="fas fa-search me-2"></i>
+                                            {{ search.search_type.title().replace('_', ' ') }}
+                                        </div>
+                                        <p class="mb-1 text-muted">{{ search.query }}</p>
+                                        <small class="text-muted">{{ search.timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
+                                    </div>
+                                    <span class="badge bg-secondary rounded-pill">
+                                        <i class="fas fa-eye"></i>
+                                    </span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="{{ url_for('search_history') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-history me-2"></i>
+                                View All History
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No recent searches. Start your investigation above!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 mb-4">
+            <div class="card bg-dark border-secondary">
+                <div class="card-header bg-secondary">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bookmark me-2"></i>
+                        Bookmarks
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if bookmarks %}
+                        <div class="list-group list-group-flush">
+                            {% for bookmark in bookmarks %}
+                                <div class="list-group-item bg-dark border-secondary">
+                                    <div class="fw-bold text-warning">{{ bookmark.title }}</div>
+                                    <p class="mb-1 text-muted small">{{ bookmark.query }}</p>
+                                    <small class="text-muted">{{ bookmark.timestamp.strftime('%Y-%m-%d') }}</small>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="{{ url_for('bookmarks') }}" class="btn btn-outline-warning">
+                                <i class="fas fa-bookmark me-2"></i>
+                                View All Bookmarks
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-bookmark fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No bookmarks yet. Save important findings!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Overview -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card bg-dark border-secondary">
+                <div class="card-header bg-secondary">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Platform Features
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-warning">
+                                <i class="fas fa-shield-alt me-2"></i>
+                                Security Features
+                            </h6>
+                            <ul class="list-unstyled text-muted">
+                                <li><i class="fas fa-check text-success me-2"></i>Rate limiting protection</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Secure data handling</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Privacy-focused design</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Discord webhook alerts</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-warning">
+                                <i class="fas fa-cogs me-2"></i>
+                                Advanced Capabilities
+                            </h6>
+                            <ul class="list-unstyled text-muted">
+                                <li><i class="fas fa-check text-success me-2"></i>Multi-platform searches</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Comprehensive reporting</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Export functionality</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Investigation tracking</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

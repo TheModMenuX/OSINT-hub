@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Search History - OSINT Platform{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-dark border-secondary">
+                <div class="card-header">
+                    <h3 class="mb-0">
+                        <i class="fas fa-history me-2"></i>
+                        Search History
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-0">
+                        Track your OSINT investigations and research activities. Export or bookmark important findings.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search History -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-dark border-secondary">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clock me-2"></i>
+                        Recent Searches
+                    </h5>
+                    {% if searches %}
+                        <span class="badge bg-primary">{{ searches|length }} searches</span>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if searches %}
+                        <div class="table-responsive">
+                            <table class="table table-dark table-hover">
+                                <thead>
+                                    <tr>
+                                        <th><i class="fas fa-tag me-1"></i>Type</th>
+                                        <th><i class="fas fa-search me-1"></i>Query</th>
+                                        <th><i class="fas fa-clock me-1"></i>Date</th>
+                                        <th><i class="fas fa-network-wired me-1"></i>IP</th>
+                                        <th><i class="fas fa-cogs me-1"></i>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for search in searches %}
+                                        <tr>
+                                            <td>
+                                                <span class="badge bg-{{ 'info' if search.search_type == 'ip_lookup' else 'success' if search.search_type == 'email_search' else 'warning' if search.search_type == 'domain_analysis' else 'primary' if search.search_type == 'username_search' else 'danger' }}">
+                                                    {{ search.search_type.replace('_', ' ').title() }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <code class="text-light">{{ search.query }}</code>
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">
+                                                    {{ search.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">
+                                                    {{ search.ip_address or 'Unknown' }}
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <a href="{{ url_for('export_results', search_id=search.id) }}" 
+                                                       class="btn btn-outline-info" 
+                                                       title="Export Results">
+                                                        <i class="fas fa-download"></i>
+                                                    </a>
+                                                    <button class="btn btn-outline-warning" 
+                                                            onclick="bookmarkSearch({{ search.id }}, '{{ search.search_type }}', '{{ search.query }}')"
+                                                            title="Bookmark">
+                                                        <i class="fas fa-bookmark"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-search fa-4x text-muted mb-3"></i>
+                            <h5 class="text-muted">No searches in history</h5>
+                            <p class="text-muted">
+                                Start investigating to see your search history here.
+                            </p>
+                            <a href="{{ url_for('index') }}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>
+                                Start Investigating
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function bookmarkSearch(searchId, searchType, query) {
+    const title = prompt(`Enter bookmark title for ${searchType}:`, `${searchType}: ${query}`);
+    if (title) {
+        fetch('/bookmark', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                title: title,
+                search_type: searchType,
+                query: query,
+                results: '{}', // Would need to fetch actual results
+                notes: ''
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Bookmark added successfully!');
+            } else {
+                alert('Error adding bookmark: ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('Error: ' + error);
+        });
+    }
+}
+</script>
+{% endblock %}

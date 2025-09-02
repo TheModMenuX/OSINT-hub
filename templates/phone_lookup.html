@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Phone Lookup - OSINT Platform{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="card bg-dark border-danger mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-phone me-2"></i>
+                        Phone Number Lookup & Analysis
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-0">
+                        Analyze phone numbers to discover location, carrier information, and number type.
+                        Useful for verification and investigation purposes in cybersecurity research.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Search Form -->
+            <div class="card bg-dark border-secondary">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-search me-2"></i>
+                        Phone Number Analysis
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label text-light">
+                                <i class="fas fa-phone-alt me-2"></i>
+                                Phone Number
+                            </label>
+                            <input 
+                                type="tel" 
+                                class="form-control bg-dark border-secondary text-light" 
+                                id="phone" 
+                                name="phone" 
+                                placeholder="Enter phone number (e.g., +1-555-123-4567)"
+                                pattern="^[\+]?[1-9][\d]{0,15}$"
+                                required
+                            >
+                            <div class="invalid-feedback">
+                                Please enter a valid phone number.
+                            </div>
+                            <div class="form-text text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Enter with or without country code. Supports international formats.
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-danger" id="searchBtn">
+                                <i class="fas fa-search me-2"></i>
+                                Analyze Phone Number
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Format Examples -->
+            <div class="card bg-dark border-secondary mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-list me-2"></i>
+                        Supported Formats
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-2">Try these number formats:</p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-danger">US/Canada Numbers</h6>
+                            <ul class="list-unstyled text-muted small">
+                                <li><i class="fas fa-phone text-success me-2"></i>+1-555-123-4567</li>
+                                <li><i class="fas fa-phone text-success me-2"></i>(555) 123-4567</li>
+                                <li><i class="fas fa-phone text-success me-2"></i>555-123-4567</li>
+                                <li><i class="fas fa-phone text-success me-2"></i>5551234567</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-danger">International</h6>
+                            <ul class="list-unstyled text-muted small">
+                                <li><i class="fas fa-phone text-info me-2"></i>+44 20 7946 0958 (UK)</li>
+                                <li><i class="fas fa-phone text-info me-2"></i>+49 30 12345678 (Germany)</li>
+                                <li><i class="fas fa-phone text-info me-2"></i>+33 1 42 86 83 26 (France)</li>
+                                <li><i class="fas fa-phone text-info me-2"></i>+81 3 1234 5678 (Japan)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analysis Features -->
+            <div class="card bg-dark border-warning mt-4">
+                <div class="card-header bg-warning text-dark">
+                    <h6 class="mb-0">
+                        <i class="fas fa-cogs me-2"></i>
+                        Analysis Capabilities
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-warning">Location Intelligence</h6>
+                            <ul class="list-unstyled text-muted small">
+                                <li><i class="fas fa-flag text-primary me-2"></i>Country identification</li>
+                                <li><i class="fas fa-map-marker-alt text-info me-2"></i>Region and area code</li>
+                                <li><i class="fas fa-city text-success me-2"></i>City/location lookup</li>
+                                <li><i class="fas fa-clock text-warning me-2"></i>Timezone information</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-warning">Technical Details</h6>
+                            <ul class="list-unstyled text-muted small">
+                                <li><i class="fas fa-mobile-alt text-primary me-2"></i>Mobile vs landline</li>
+                                <li><i class="fas fa-building text-info me-2"></i>Carrier identification</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i>Number validation</li>
+                                <li><i class="fas fa-format-list-numbered text-secondary me-2"></i>Format standardization</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Privacy Notice -->
+            <div class="alert alert-info d-flex align-items-center mt-4" role="alert">
+                <i class="fas fa-shield-alt me-2"></i>
+                <div>
+                    <strong>Privacy & Legal:</strong> Phone number lookups use public databases and carrier information only.
+                    No personal or private data is accessed. Use responsibly and legally.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Form validation
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script>
+{% endblock %}

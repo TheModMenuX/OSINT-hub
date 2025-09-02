@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}IP Geolocation - OSINT Platform{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="card bg-dark border-info mb-4">
+                <div class="card-header bg-info text-dark">
+                    <h3 class="mb-0">
+                        <i class="fas fa-globe me-2"></i>
+                        IP Geolocation & Analysis
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-0">
+                        Analyze IP addresses to discover location, ISP information, open ports, and security details.
+                        This tool provides comprehensive intelligence gathering for network investigations.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Search Form -->
+            <div class="card bg-dark border-secondary">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-search me-2"></i>
+                        IP Address Lookup
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="ip_address" class="form-label text-light">
+                                <i class="fas fa-network-wired me-2"></i>
+                                IP Address
+                            </label>
+                            <input 
+                                type="text" 
+                                class="form-control bg-dark border-secondary text-light" 
+                                id="ip_address" 
+                                name="ip_address" 
+                                placeholder="Enter IP address (e.g., 8.8.8.8)"
+                                pattern="^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+                                required
+                            >
+                            <div class="invalid-feedback">
+                                Please enter a valid IP address.
+                            </div>
+                            <div class="form-text text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Enter an IPv4 address to analyze its geolocation, ISP, and security information.
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-info" id="searchBtn">
+                                <i class="fas fa-search me-2"></i>
+                                Analyze IP Address
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Quick Examples -->
+            <div class="card bg-dark border-secondary mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        Quick Examples
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-2">Try these sample IP addresses:</p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button class="btn btn-outline-info btn-sm" onclick="fillIP('8.8.8.8')">
+                            8.8.8.8 (Google DNS)
+                        </button>
+                        <button class="btn btn-outline-info btn-sm" onclick="fillIP('1.1.1.1')">
+                            1.1.1.1 (Cloudflare)
+                        </button>
+                        <button class="btn btn-outline-info btn-sm" onclick="fillIP('208.67.222.222')">
+                            208.67.222.222 (OpenDNS)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Information Panel -->
+            <div class="card bg-dark border-warning mt-4">
+                <div class="card-header bg-warning text-dark">
+                    <h6 class="mb-0">
+                        <i class="fas fa-shield-alt me-2"></i>
+                        What This Tool Provides
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-warning">Location Intelligence</h6>
+                            <ul class="list-unstyled text-muted small">
+                                <li><i class="fas fa-map-marker-alt text-info me-2"></i>Geographic coordinates</li>
+                                <li><i class="fas fa-flag text-info me-2"></i>Country and region</li>
+                                <li><i class="fas fa-city text-info me-2"></i>City and timezone</li>
+                                <li><i class="fas fa-building text-info me-2"></i>ISP and organization</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-warning">Security Analysis</h6>
+                            <ul class="list-unstyled text-muted small">
+                                <li><i class="fas fa-door-open text-danger me-2"></i>Open port scanning</li>
+                                <li><i class="fas fa-server text-warning me-2"></i>DNS reverse lookup</li>
+                                <li><i class="fas fa-bug text-danger me-2"></i>Vulnerability data (if available)</li>
+                                <li><i class="fas fa-history text-secondary me-2"></i>Historical data tracking</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function fillIP(ip) {
+    document.getElementById('ip_address').value = ip;
+}
+
+// Form validation
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script>
+{% endblock %}

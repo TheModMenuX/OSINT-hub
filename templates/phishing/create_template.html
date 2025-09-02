@@ -1,0 +1,385 @@
+{% extends "base.html" %}
+
+{% block title %}Create Template - OSINT Tool{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="text-success">
+                <i class="fas fa-plus me-2"></i>Create Phishing Template
+            </h2>
+            <a href="{{ url_for('phishing.templates') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Templates
+            </a>
+        </div>
+        
+        <!-- Warning Notice -->
+        <div class="alert alert-warning mb-4" role="alert">
+            <h6 class="alert-heading"><i class="fas fa-shield-alt me-2"></i>Authorized Use Only</h6>
+            <p class="mb-0">This template will be used for authorized security testing. Ensure you have proper 
+            permission and follow your organization's security testing guidelines.</p>
+        </div>
+    </div>
+</div>
+
+<form method="POST" action="{{ url_for('phishing.save_template') }}">
+    <div class="row g-4">
+        <!-- Template Info -->
+        <div class="col-lg-4">
+            <div class="card bg-secondary h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Template Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Template Name</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="name" 
+                               name="name" 
+                               placeholder="e.g., Corporate Login Page"
+                               required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="template_type" class="form-label">Template Type</label>
+                        <select class="form-select" id="template_type" name="template_type" required>
+                            <option value="">Select type...</option>
+                            <option value="login">Login Page</option>
+                            <option value="survey">Survey/Form</option>
+                            <option value="notification">Notification</option>
+                            <option value="update">Update Required</option>
+                            <option value="verification">Account Verification</option>
+                            <option value="security">Security Alert</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Template Presets -->
+                    <div class="mb-3">
+                        <label class="form-label">Quick Presets</label>
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-outline-info btn-sm" onclick="loadPreset('basic_login')">
+                                Basic Login Form
+                            </button>
+                            <button type="button" class="btn btn-outline-info btn-sm" onclick="loadPreset('office_login')">
+                                Office 365 Style
+                            </button>
+                            <button type="button" class="btn btn-outline-info btn-sm" onclick="loadPreset('bank_alert')">
+                                Banking Alert
+                            </button>
+                            <button type="button" class="btn btn-outline-info btn-sm" onclick="loadPreset('survey')">
+                                Survey Form
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Code Editors -->
+        <div class="col-lg-8">
+            <div class="card bg-secondary">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                        <li class="nav-item">
+                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#html-tab">
+                                <i class="fab fa-html5 me-1"></i>HTML
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#css-tab">
+                                <i class="fab fa-css3-alt me-1"></i>CSS
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#js-tab">
+                                <i class="fab fa-js-square me-1"></i>JavaScript
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#preview-tab">
+                                <i class="fas fa-eye me-1"></i>Preview
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body p-0">
+                    <div class="tab-content">
+                        <!-- HTML Tab -->
+                        <div class="tab-pane fade show active" id="html-tab">
+                            <textarea class="form-control border-0 bg-dark text-light font-monospace" 
+                                      id="html_content" 
+                                      name="html_content" 
+                                      rows="20" 
+                                      placeholder="Enter HTML content here..."
+                                      required></textarea>
+                        </div>
+                        
+                        <!-- CSS Tab -->
+                        <div class="tab-pane fade" id="css-tab">
+                            <textarea class="form-control border-0 bg-dark text-light font-monospace" 
+                                      id="css_content" 
+                                      name="css_content" 
+                                      rows="20" 
+                                      placeholder="Enter CSS styles here..."></textarea>
+                        </div>
+                        
+                        <!-- JavaScript Tab -->
+                        <div class="tab-pane fade" id="js-tab">
+                            <textarea class="form-control border-0 bg-dark text-light font-monospace" 
+                                      id="js_content" 
+                                      name="js_content" 
+                                      rows="20" 
+                                      placeholder="Enter JavaScript code here..."></textarea>
+                        </div>
+                        
+                        <!-- Preview Tab -->
+                        <div class="tab-pane fade" id="preview-tab">
+                            <div class="p-3">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="mb-0">Live Preview</h6>
+                                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="updatePreview()">
+                                        <i class="fas fa-refresh me-1"></i>Update Preview
+                                    </button>
+                                </div>
+                                <div class="border rounded bg-white" style="min-height: 400px;">
+                                    <iframe id="preview-frame" 
+                                            style="width: 100%; height: 400px; border: none;" 
+                                            srcdoc="<p class='text-center text-muted p-4'>Click 'Update Preview' to see your template</p>"></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <button type="button" class="btn btn-outline-info me-2" onclick="validateTemplate()">
+                        <i class="fas fa-check me-1"></i>Validate
+                    </button>
+                    <button type="button" class="btn btn-outline-warning" onclick="clearAll()">
+                        <i class="fas fa-eraser me-1"></i>Clear All
+                    </button>
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="fas fa-save me-2"></i>Save Template
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Template presets
+const presets = {
+    basic_login: {
+        name: 'Basic Login Form',
+        type: 'login',
+        html: `<!DOCTYPE html>
+<html>
+<head>
+    <title>Sign In</title>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Sign In</h2>
+        <form>
+            <input type="email" placeholder="Email" required>
+            <input type="password" placeholder="Password" required>
+            <button type="submit">Sign In</button>
+        </form>
+    </div>
+</body>
+</html>`,
+        css: `.login-container {
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+button {
+    width: 100%;
+    padding: 10px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}`,
+        js: ''
+    },
+    office_login: {
+        name: 'Office 365 Style Login',
+        type: 'login',
+        html: `<!DOCTYPE html>
+<html>
+<head>
+    <title>Microsoft Office 365</title>
+</head>
+<body>
+    <div class="office-login">
+        <div class="logo">Microsoft</div>
+        <h2>Sign in to your account</h2>
+        <form>
+            <input type="email" placeholder="Email, phone, or Skype">
+            <button type="submit">Next</button>
+        </form>
+        <div class="links">
+            <a href="#">Can't access your account?</a>
+        </div>
+    </div>
+</body>
+</html>`,
+        css: `body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; }
+.office-login { max-width: 400px; margin: 50px auto; background: white; padding: 30px; }
+.logo { font-size: 24px; font-weight: bold; color: #0078d4; margin-bottom: 20px; }
+input { width: 100%; padding: 15px; margin: 15px 0; border: 1px solid #ccc; }
+button { width: 100%; padding: 15px; background: #0078d4; color: white; border: none; }`,
+        js: ''
+    },
+    bank_alert: {
+        name: 'Banking Security Alert',
+        type: 'security',
+        html: `<!DOCTYPE html>
+<html>
+<head>
+    <title>Security Alert - Immediate Action Required</title>
+</head>
+<body>
+    <div class="alert-container">
+        <div class="alert-header">⚠️ SECURITY ALERT</div>
+        <h2>Immediate Action Required</h2>
+        <p>We've detected unusual activity on your account. Please verify your identity immediately to prevent account suspension.</p>
+        <form>
+            <input type="text" placeholder="Account Number">
+            <input type="password" placeholder="PIN">
+            <button type="submit">Verify Now</button>
+        </form>
+        <p class="warning">Your account will be suspended in 24 hours if not verified.</p>
+    </div>
+</body>
+</html>`,
+        css: `.alert-container { max-width: 500px; margin: 50px auto; padding: 20px; border: 3px solid #dc3545; background: #fff; }
+.alert-header { background: #dc3545; color: white; padding: 10px; text-align: center; font-weight: bold; margin: -20px -20px 20px; }
+.warning { color: #dc3545; font-weight: bold; text-align: center; }
+input { width: 100%; padding: 10px; margin: 10px 0; }
+button { width: 100%; padding: 15px; background: #dc3545; color: white; border: none; }`,
+        js: ''
+    },
+    survey: {
+        name: 'Customer Survey',
+        type: 'survey',
+        html: `<!DOCTYPE html>
+<html>
+<head>
+    <title>Customer Satisfaction Survey</title>
+</head>
+<body>
+    <div class="survey-container">
+        <h2>Help Us Improve!</h2>
+        <p>Your feedback is valuable to us. Please take a moment to complete this short survey.</p>
+        <form>
+            <label>How satisfied are you with our service?</label>
+            <select>
+                <option>Very Satisfied</option>
+                <option>Satisfied</option>
+                <option>Neutral</option>
+                <option>Dissatisfied</option>
+            </select>
+            <label>Email (for follow-up):</label>
+            <input type="email" placeholder="your.email@example.com">
+            <label>Additional Comments:</label>
+            <textarea placeholder="Tell us more..."></textarea>
+            <button type="submit">Submit Survey</button>
+        </form>
+    </div>
+</body>
+</html>`,
+        css: `.survey-container { max-width: 600px; margin: 50px auto; padding: 30px; background: #f8f9fa; border-radius: 10px; }
+label { display: block; margin-top: 15px; font-weight: bold; }
+input, select, textarea { width: 100%; padding: 10px; margin: 5px 0 15px; border: 1px solid #ddd; border-radius: 5px; }
+button { width: 100%; padding: 15px; background: #28a745; color: white; border: none; border-radius: 5px; }`,
+        js: ''
+    }
+};
+
+function loadPreset(presetName) {
+    const preset = presets[presetName];
+    if (preset) {
+        document.getElementById('name').value = preset.name;
+        document.getElementById('template_type').value = preset.type;
+        document.getElementById('html_content').value = preset.html;
+        document.getElementById('css_content').value = preset.css;
+        document.getElementById('js_content').value = preset.js;
+    }
+}
+
+function updatePreview() {
+    const html = document.getElementById('html_content').value;
+    const css = document.getElementById('css_content').value;
+    const js = document.getElementById('js_content').value;
+    
+    const fullHtml = `
+        <style>${css}</style>
+        ${html}
+        <script>${js}</script>
+    `;
+    
+    document.getElementById('preview-frame').srcdoc = fullHtml;
+}
+
+function validateTemplate() {
+    const html = document.getElementById('html_content').value.trim();
+    if (!html) {
+        alert('HTML content is required!');
+        return false;
+    }
+    
+    // Basic HTML validation
+    if (!html.includes('<html>') || !html.includes('</html>')) {
+        if (!confirm('HTML doesn\'t appear to be a complete document. Continue anyway?')) {
+            return false;
+        }
+    }
+    
+    alert('Template validation passed!');
+    return true;
+}
+
+function clearAll() {
+    if (confirm('Are you sure you want to clear all content?')) {
+        document.getElementById('name').value = '';
+        document.getElementById('template_type').value = '';
+        document.getElementById('html_content').value = '';
+        document.getElementById('css_content').value = '';
+        document.getElementById('js_content').value = '';
+        document.getElementById('preview-frame').srcdoc = "<p class='text-center text-muted p-4'>Content cleared</p>";
+    }
+}
+
+// Auto-update preview when switching to preview tab
+document.querySelector('button[data-bs-target="#preview-tab"]').addEventListener('shown.bs.tab', function() {
+    updatePreview();
+});
+</script>
+{% endblock %}

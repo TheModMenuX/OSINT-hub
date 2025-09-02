@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Page Not Found - OSINT Platform{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card bg-dark border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h3 class="mb-0">
+                        <i class="fas fa-search me-2"></i>
+                        Page Not Found
+                    </h3>
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-map-signs fa-5x text-warning mb-3"></i>
+                        <h4 class="text-light">404 - Resource Not Located</h4>
+                        <p class="text-muted">
+                            The intelligence you're looking for has moved or doesn't exist. 
+                            Our OSINT tools couldn't track down this resource.
+                        </p>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <a href="{{ url_for('index') }}" class="btn btn-warning">
+                            <i class="fas fa-home me-2"></i>
+                            Return to Base
+                        </a>
+                        <button onclick="history.back()" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Go Back
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card bg-dark border-secondary mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-compass me-2"></i>
+                        Navigate to:
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <a href="{{ url_for('ip_lookup') }}" class="text-decoration-none">
+                                        <i class="fas fa-globe text-info me-2"></i>
+                                        IP Geolocation
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="{{ url_for('email_search') }}" class="text-decoration-none">
+                                        <i class="fas fa-envelope text-success me-2"></i>
+                                        Email Search
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="{{ url_for('domain_analysis') }}" class="text-decoration-none">
+                                        <i class="fas fa-server text-warning me-2"></i>
+                                        Domain Analysis
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <a href="{{ url_for('username_search') }}" class="text-decoration-none">
+                                        <i class="fas fa-user text-primary me-2"></i>
+                                        Username Search
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="{{ url_for('phone_lookup') }}" class="text-decoration-none">
+                                        <i class="fas fa-phone text-danger me-2"></i>
+                                        Phone Lookup
+                                    </a>
+                                </li>
+                                <li class="mb-2">
+                                    <a href="{{ url_for('search_history') }}" class="text-decoration-none">
+                                        <i class="fas fa-history text-secondary me-2"></i>
+                                        Search History
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

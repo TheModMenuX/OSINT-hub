@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - OSINT Tool{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Header -->
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="text-primary"><i class="fas fa-tachometer-alt me-2"></i>OSINT Dashboard</h1>
+            <div class="text-muted">
+                <i class="fas fa-clock me-1"></i>Last updated: <span id="last-updated"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Statistics Cards -->
+    <div class="col-md-3">
+        <div class="card bg-primary text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h3 class="card-title mb-0">{{ stats.total_searches }}</h3>
+                        <p class="card-text">Total Searches</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-search fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-primary bg-opacity-75">
+                <i class="fas fa-arrow-up me-1"></i>{{ stats.recent_searches }} this week
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-success text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h3 class="card-title mb-0">{{ stats.username_searches }}</h3>
+                        <p class="card-text">Username Searches</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-user fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-success bg-opacity-75">
+                <a href="{{ url_for('osint.username_search') }}" class="text-white text-decoration-none">
+                    <i class="fas fa-arrow-right me-1"></i>Start Search
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-info text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h3 class="card-title mb-0">{{ stats.domain_searches }}</h3>
+                        <p class="card-text">Domain Searches</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-globe fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-info bg-opacity-75">
+                <a href="{{ url_for('osint.domain_search') }}" class="text-white text-decoration-none">
+                    <i class="fas fa-arrow-right me-1"></i>Start Search
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-warning text-dark h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h3 class="card-title mb-0">{{ stats.email_searches }}</h3>
+                        <p class="card-text">Email Searches</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-envelope fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-warning bg-opacity-75">
+                <a href="{{ url_for('osint.email_search') }}" class="text-dark text-decoration-none">
+                    <i class="fas fa-arrow-right me-1"></i>Start Search
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-4">
+    <!-- Quick Actions -->
+    <div class="col-lg-8">
+        <div class="card bg-secondary">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="d-grid">
+                            <a href="{{ url_for('osint.username_search') }}" class="btn btn-outline-primary btn-lg">
+                                <i class="fas fa-user me-2"></i>Search Username
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-grid">
+                            <a href="{{ url_for('osint.domain_search') }}" class="btn btn-outline-info btn-lg">
+                                <i class="fas fa-globe me-2"></i>Search Domain
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-grid">
+                            <a href="{{ url_for('osint.email_search') }}" class="btn btn-outline-warning btn-lg">
+                                <i class="fas fa-envelope me-2"></i>Search Email
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-grid">
+                            <a href="{{ url_for('phishing.create_template') }}" class="btn btn-outline-danger btn-lg">
+                                <i class="fas fa-plus me-2"></i>Create Template
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- System Status -->
+    <div class="col-lg-4">
+        <div class="card bg-secondary h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-server me-2"></i>System Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item bg-transparent d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-database me-2"></i>Database</span>
+                        <span class="badge bg-success rounded-pill">Online</span>
+                    </div>
+                    <div class="list-group-item bg-transparent d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-search me-2"></i>OSINT Tools</span>
+                        <span class="badge bg-success rounded-pill">Ready</span>
+                    </div>
+                    <div class="list-group-item bg-transparent d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-shield-alt me-2"></i>Security</span>
+                        <span class="badge bg-success rounded-pill">Active</span>
+                    </div>
+                    <div class="list-group-item bg-transparent d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-chart-bar me-2"></i>Analytics</span>
+                        <span class="badge bg-success rounded-pill">Tracking</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Security Notice -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="alert alert-warning" role="alert">
+            <h5 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Security Notice</h5>
+            <p class="mb-0">This tool is designed for educational purposes and authorized security testing only. 
+            Ensure you have proper authorization before conducting any OSINT activities or using phishing templates.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

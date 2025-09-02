@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Domain Search - OSINT Tool{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card bg-secondary">
+            <div class="card-header">
+                <h4 class="card-title mb-0">
+                    <i class="fas fa-globe me-2"></i>Domain Search
+                </h4>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-4">
+                    Analyze domain information including web content, security headers, and basic infrastructure details.
+                </p>
+                
+                <form method="POST" action="{{ url_for('osint.search_domain') }}" class="mb-4">
+                    <div class="mb-3">
+                        <label for="domain" class="form-label">Domain Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-globe"></i>
+                            </span>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="domain" 
+                                   name="domain" 
+                                   placeholder="example.com"
+                                   required>
+                        </div>
+                        <div class="form-text">
+                            Enter the domain name without http:// or https:// prefix
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                        <button type="submit" class="btn btn-info btn-lg">
+                            <i class="fas fa-search me-2"></i>Analyze Domain
+                        </button>
+                        <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </form>
+                
+                <!-- Search Information -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h6 class="text-info mb-3">
+                            <i class="fas fa-info-circle me-2"></i>Analysis includes:
+                        </h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check text-success me-2"></i>HTTP/HTTPS availability</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>SSL certificate status</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Response headers</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Redirect analysis</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check text-success me-2"></i>Website content extraction</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Content length analysis</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Basic security checks</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Server information</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Examples -->
+                <div class="card bg-dark mt-4">
+                    <div class="card-body">
+                        <h6 class="text-warning mb-3">
+                            <i class="fas fa-lightbulb me-2"></i>Example domains to try:
+                        </h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-outline-info btn-sm" onclick="setDomain('google.com')">google.com</button>
+                            <button class="btn btn-outline-info btn-sm" onclick="setDomain('github.com')">github.com</button>
+                            <button class="btn btn-outline-info btn-sm" onclick="setDomain('stackoverflow.com')">stackoverflow.com</button>
+                            <button class="btn btn-outline-info btn-sm" onclick="setDomain('reddit.com')">reddit.com</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Warning -->
+                <div class="alert alert-warning mt-4" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Legal Notice:</strong> Only analyze domains you own or have explicit permission to investigate. 
+                    Respect robots.txt and terms of service.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function setDomain(domain) {
+    document.getElementById('domain').value = domain;
+}
+</script>
+<script src="{{ url_for('static', filename='js/osint.js') }}"></script>
+{% endblock %}

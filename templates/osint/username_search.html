@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Username Search - OSINT Tool{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card bg-secondary">
+            <div class="card-header">
+                <h4 class="card-title mb-0">
+                    <i class="fas fa-user me-2"></i>Username Search
+                </h4>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-4">
+                    Search for a username across multiple social media platforms and websites to gather information about potential accounts.
+                </p>
+                
+                <form method="POST" action="{{ url_for('osint.search_username') }}" class="mb-4">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-user"></i>
+                            </span>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="username" 
+                                   name="username" 
+                                   placeholder="Enter username to search..."
+                                   required>
+                        </div>
+                        <div class="form-text">
+                            Enter the username without @ symbol or domain extensions
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-search me-2"></i>Start Search
+                        </button>
+                        <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </form>
+                
+                <!-- Search Information -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-info-circle me-2"></i>What this search includes:
+                        </h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check text-success me-2"></i>GitHub</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Twitter</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Instagram</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Reddit</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>LinkedIn</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check text-success me-2"></i>YouTube</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>TikTok</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Twitch</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Steam</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Pinterest</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Warning -->
+                <div class="alert alert-warning mt-4" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Legal Notice:</strong> This tool should only be used for legitimate security research, 
+                    investigation, or with proper authorization. Respect privacy and terms of service of all platforms.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/osint.js') }}"></script>
+{% endblock %}

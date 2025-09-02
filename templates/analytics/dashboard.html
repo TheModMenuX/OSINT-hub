@@ -1,0 +1,341 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics Dashboard - OSINT Tool{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="text-primary">
+                <i class="fas fa-chart-bar me-2"></i>Analytics Dashboard
+            </h2>
+            <div class="btn-group" role="group">
+                <a href="?days=1" class="btn btn-outline-secondary {{ 'active' if stats.date_range == 1 }}">24h</a>
+                <a href="?days=7" class="btn btn-outline-secondary {{ 'active' if stats.date_range == 7 }}">7d</a>
+                <a href="?days=30" class="btn btn-outline-secondary {{ 'active' if stats.date_range == 30 }}">30d</a>
+                <a href="?days=90" class="btn btn-outline-secondary {{ 'active' if stats.date_range == 90 }}">90d</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Overview Stats -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h3 class="mb-0">{{ stats.total_searches }}</h3>
+                        <p class="mb-0">Total Searches</p>
+                    </div>
+                    <i class="fas fa-search fa-2x opacity-75"></i>
+                </div>
+                <small class="text-white-50">
+                    {{ stats.recent_searches }} in selected period
+                </small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h3 class="mb-0">{{ stats.total_sessions }}</h3>
+                        <p class="mb-0">Total Sessions</p>
+                    </div>
+                    <i class="fas fa-users fa-2x opacity-75"></i>
+                </div>
+                <small class="text-white-50">
+                    {{ stats.active_sessions }} active recently
+                </small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h3 class="mb-0">{{ stats.event_types|length }}</h3>
+                        <p class="mb-0">Event Types</p>
+                    </div>
+                    <i class="fas fa-calendar-check fa-2x opacity-75"></i>
+                </div>
+                <small class="text-white-50">
+                    Different activity types tracked
+                </small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-warning text-dark">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h3 class="mb-0">{{ ((stats.recent_searches / stats.total_searches * 100) if stats.total_searches > 0 else 0)|round(1) }}%</h3>
+                        <p class="mb-0">Activity Rate</p>
+                    </div>
+                    <i class="fas fa-chart-line fa-2x opacity-75"></i>
+                </div>
+                <small class="text-dark opacity-75">
+                    Recent vs total activity
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Search Types Chart -->
+    <div class="col-lg-6">
+        <div class="card bg-secondary h-100">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-pie-chart me-2"></i>Search Types</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="searchTypesChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Daily Activity Chart -->
+    <div class="col-lg-6">
+        <div class="card bg-secondary h-100">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Daily Activity</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="dailyActivityChart" width="400" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top Queries -->
+    <div class="col-lg-8">
+        <div class="card bg-secondary h-100">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-list-ol me-2"></i>Top Search Queries</h5>
+            </div>
+            <div class="card-body">
+                {% if stats.top_queries %}
+                <div class="table-responsive">
+                    <table class="table table-dark table-striped">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Query</th>
+                                <th>Type</th>
+                                <th>Count</th>
+                                <th>Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for query in stats.top_queries[:10] %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td><code class="text-primary">{{ query.query }}</code></td>
+                                <td>
+                                    <span class="badge bg-{% if query.type == 'username' %}success{% elif query.type == 'domain' %}info{% else %}warning{% endif %}">
+                                        {{ query.type.title() }}
+                                    </span>
+                                </td>
+                                <td>{{ query.count }}</td>
+                                <td>{{ ((query.count / stats.recent_searches * 100) if stats.recent_searches > 0 else 0)|round(1) }}%</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="fas fa-search fa-3x mb-3 opacity-50"></i>
+                    <p>No search queries in selected period</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Event Types -->
+    <div class="col-lg-4">
+        <div class="card bg-secondary h-100">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-tasks me-2"></i>Event Types</h5>
+            </div>
+            <div class="card-body">
+                {% if stats.event_types %}
+                <div class="list-group list-group-flush">
+                    {% for event in stats.event_types[:8] %}
+                    <div class="list-group-item bg-transparent d-flex justify-content-between align-items-center">
+                        <span class="text-light">{{ event.type.replace('_', ' ').title() }}</span>
+                        <span class="badge bg-primary rounded-pill">{{ event.count }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="fas fa-calendar fa-3x mb-3 opacity-50"></i>
+                    <p>No events in selected period</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Activity -->
+    <div class="col-12">
+        <div class="card bg-secondary">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                {% if stats.recent_events %}
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Event</th>
+                                <th>Details</th>
+                                <th>IP Address</th>
+                                <th>User Agent</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in stats.recent_events %}
+                            <tr>
+                                <td>
+                                    <small>{{ event.timestamp.strftime('%m/%d %H:%M:%S') }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{% if 'search' in event.event_type %}info{% elif 'template' in event.event_type %}warning{% else %}secondary{% endif %}">
+                                        {{ event.event_type.replace('_', ' ').title() }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if event.event_data %}
+                                        {% set data = event.event_data | from_json %}
+                                        <small class="text-muted">
+                                            {% for key, value in data.items() %}
+                                                <strong>{{ key.title() }}:</strong> {{ value[:50] }}{% if value|length > 50 %}...{% endif %}
+                                                {% if not loop.last %} | {% endif %}
+                                            {% endfor %}
+                                        </small>
+                                    {% endif %}
+                                </td>
+                                <td><code class="small">{{ event.ip_address or 'Unknown' }}</code></td>
+                                <td>
+                                    <small class="text-muted">
+                                        {{ event.user_agent[:50] if event.user_agent else 'Unknown' }}{% if event.user_agent and event.user_agent|length > 50 %}...{% endif %}
+                                    </small>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="fas fa-history fa-3x mb-3 opacity-50"></i>
+                    <p>No recent activity to display</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Chart.js configurations
+Chart.defaults.color = '#ffffff';
+Chart.defaults.borderColor = '#444';
+
+// Search Types Pie Chart
+const searchTypesCtx = document.getElementById('searchTypesChart').getContext('2d');
+const searchTypesChart = new Chart(searchTypesCtx, {
+    type: 'doughnut',
+    data: {
+        labels: [{% for st in stats.search_types %}'{{ st.type.title() }}'{{ ',' if not loop.last }}{% endfor %}],
+        datasets: [{
+            data: [{% for st in stats.search_types %}{{ st.count }}{{ ',' if not loop.last }}{% endfor %}],
+            backgroundColor: [
+                '#28a745',
+                '#17a2b8', 
+                '#ffc107',
+                '#dc3545',
+                '#6f42c1'
+            ],
+            borderColor: '#343a40',
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+
+// Daily Activity Line Chart
+const dailyActivityCtx = document.getElementById('dailyActivityChart').getContext('2d');
+const dailyActivityChart = new Chart(dailyActivityCtx, {
+    type: 'line',
+    data: {
+        labels: [{% for da in stats.daily_activity %}'{{ da.date }}'{{ ',' if not loop.last }}{% endfor %}],
+        datasets: [{
+            label: 'Searches',
+            data: [{% for da in stats.daily_activity %}{{ da.searches }}{{ ',' if not loop.last }}{% endfor %}],
+            borderColor: '#007bff',
+            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+            fill: true,
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: '#444'
+                }
+            },
+            x: {
+                grid: {
+                    color: '#444'
+                }
+            }
+        },
+        plugins: {
+            legend: {
+                display: false
+            }
+        }
+    }
+});
+
+// Custom JSON filter for Jinja2 (if needed)
+{% raw %}
+// This handles the from_json filter in the template
+function parseEventData(eventData) {
+    try {
+        return JSON.parse(eventData);
+    } catch (e) {
+        return {};
+    }
+}
+{% endraw %}
+</script>
+{% endblock %}

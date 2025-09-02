@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Username Search - OSINT Platform{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="card bg-dark border-primary mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-user me-2"></i>
+                        Username Search Across Platforms
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-0">
+                        Search for usernames across multiple social media platforms and websites.
+                        Discover digital footprints and profile associations for investigative purposes.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Search Form -->
+            <div class="card bg-dark border-secondary">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-search me-2"></i>
+                        Username Investigation
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="username" class="form-label text-light">
+                                <i class="fas fa-user-tag me-2"></i>
+                                Username
+                            </label>
+                            <input 
+                                type="text" 
+                                class="form-control bg-dark border-secondary text-light" 
+                                id="username" 
+                                name="username" 
+                                placeholder="Enter username (e.g., johndoe123)"
+                                pattern="^[a-zA-Z0-9_.-]{3,30}$"
+                                required
+                            >
+                            <div class="invalid-feedback">
+                                Username must be 3-30 characters long and contain only letters, numbers, dots, dashes, and underscores.
+                            </div>
+                            <div class="form-text text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Enter a username to search across 15+ popular platforms and social networks.
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary" id="searchBtn">
+                                <i class="fas fa-search me-2"></i>
+                                Search Username
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Platforms Searched -->
+            <div class="card bg-dark border-secondary mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-share-alt me-2"></i>
+                        Platforms Searched
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">This tool searches the following platforms:</p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="d-flex flex-wrap gap-2 mb-3">
+                                <span class="badge bg-primary"><i class="fab fa-github me-1"></i>GitHub</span>
+                                <span class="badge bg-info"><i class="fab fa-twitter me-1"></i>Twitter</span>
+                                <span class="badge bg-danger"><i class="fab fa-instagram me-1"></i>Instagram</span>
+                                <span class="badge bg-warning text-dark"><i class="fab fa-reddit me-1"></i>Reddit</span>
+                                <span class="badge bg-primary"><i class="fab fa-linkedin me-1"></i>LinkedIn</span>
+                                <span class="badge bg-danger"><i class="fab fa-youtube me-1"></i>YouTube</span>
+                                <span class="badge bg-danger"><i class="fab fa-pinterest me-1"></i>Pinterest</span>
+                                <span class="badge bg-dark"><i class="fab fa-tiktok me-1"></i>TikTok</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex flex-wrap gap-2">
+                                <span class="badge bg-info"><i class="fab fa-telegram me-1"></i>Telegram</span>
+                                <span class="badge bg-success"><i class="fab fa-medium me-1"></i>Medium</span>
+                                <span class="badge bg-secondary"><i class="fab fa-dribbble me-1"></i>Dribbble</span>
+                                <span class="badge bg-primary"><i class="fab fa-behance me-1"></i>Behance</span>
+                                <span class="badge bg-success"><i class="fab fa-deviantart me-1"></i>DeviantArt</span>
+                                <span class="badge bg-primary"><i class="fab fa-steam me-1"></i>Steam</span>
+                                <span class="badge bg-purple"><i class="fab fa-twitch me-1"></i>Twitch</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Tips -->
+            <div class="card bg-dark border-success mt-4">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        Search Tips & Best Practices
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-success">Effective Searching</h6>
+                            <ul class="list-unstyled text-muted small">
+                                <li><i class="fas fa-check text-success me-2"></i>Try common username variations</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Search with and without numbers</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Check for underscores and dots</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Consider birth years in usernames</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-success">Investigation Notes</h6>
+                            <ul class="list-unstyled text-muted small">
+                                <li><i class="fas fa-clock text-warning me-2"></i>Results are real-time checked</li>
+                                <li><i class="fas fa-shield-alt text-info me-2"></i>Only public profiles detected</li>
+                                <li><i class="fas fa-bookmark text-primary me-2"></i>Save important findings</li>
+                                <li><i class="fas fa-download text-secondary me-2"></i>Export results for reports</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Legal Notice -->
+            <div class="alert alert-warning d-flex align-items-center mt-4" role="alert">
+                <i class="fas fa-balance-scale me-2"></i>
+                <div>
+                    <strong>Ethical Use:</strong> This tool is for legitimate research and investigation purposes only.
+                    Always respect privacy rights and platform terms of service. Use responsibly.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Form validation
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script>
+{% endblock %}

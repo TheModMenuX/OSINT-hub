@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Phishing Templates - OSINT Tool{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="text-primary">
+                <i class="fas fa-file-code me-2"></i>Phishing Templates
+            </h2>
+            <a href="{{ url_for('phishing.create_template') }}" class="btn btn-success">
+                <i class="fas fa-plus me-2"></i>Create New Template
+            </a>
+        </div>
+        
+        <!-- Warning Notice -->
+        <div class="alert alert-danger mb-4" role="alert">
+            <h5 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Security Testing Notice</h5>
+            <p class="mb-0">These templates are designed for authorized security testing and educational purposes only. 
+            Ensure you have proper authorization before using any phishing templates in testing scenarios.</p>
+        </div>
+    </div>
+</div>
+
+{% if templates %}
+<div class="row g-4">
+    {% for template in templates %}
+    <div class="col-lg-6 col-xl-4">
+        <div class="card bg-secondary h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{{ template.name }}</h5>
+                <span class="badge bg-primary">{{ template.template_type.title() }}</span>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-3">
+                    <small>
+                        <i class="fas fa-calendar me-1"></i>
+                        Created: {{ template.created_at.strftime('%Y-%m-%d %H:%M') }}
+                    </small>
+                </p>
+                
+                <div class="mb-3">
+                    <small class="text-muted">Content Preview:</small>
+                    <div class="bg-dark p-2 rounded mt-1">
+                        <code class="small text-info">
+                            {{ template.html_content[:100] }}{% if template.html_content|length > 100 %}...{% endif %}
+                        </code>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        {% if template.css_content %}
+                            <i class="fab fa-css3-alt me-1"></i>CSS
+                        {% endif %}
+                        {% if template.js_content %}
+                            <i class="fab fa-js-square me-1"></i>JS
+                        {% endif %}
+                    </small>
+                    <div class="btn-group" role="group">
+                        <a href="{{ url_for('phishing.preview_template', template_id=template.id) }}" 
+                           class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <button type="button" 
+                                class="btn btn-outline-danger btn-sm"
+                                onclick="deleteTemplate({{ template.id }}, '{{ template.name }}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card bg-secondary text-center">
+            <div class="card-body py-5">
+                <i class="fas fa-file-code fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No Templates Found</h4>
+                <p class="text-muted mb-4">You haven't created any phishing templates yet. 
+                Get started by creating your first template for security testing.</p>
+                <a href="{{ url_for('phishing.create_template') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Create Your First Template
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Template Statistics -->
+{% if templates %}
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card bg-dark">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Template Statistics</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <h3 class="text-primary">{{ templates|length }}</h3>
+                        <p class="text-muted">Total Templates</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h3 class="text-success">{{ templates|selectattr('template_type', 'equalto', 'login')|list|length }}</h3>
+                        <p class="text-muted">Login Templates</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h3 class="text-info">{{ templates|selectattr('template_type', 'equalto', 'survey')|list|length }}</h3>
+                        <p class="text-muted">Survey Templates</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h3 class="text-warning">{{ templates|selectattr('css_content', 'defined')|selectattr('css_content', 'ne', '')|list|length }}</h3>
+                        <p class="text-muted">With Custom CSS</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title text-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirm Delete
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the template <strong id="templateName"></strong>?</p>
+                <p class="text-warning mb-0">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i>Delete Template
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function deleteTemplate(templateId, templateName) {
+    document.getElementById('templateName').textContent = templateName;
+    document.getElementById('deleteForm').action = `/phishing/delete/${templateId}`;
+    
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    modal.show();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+
+{% block title %}{{ search_type }} Results - OSINT Tool{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="text-primary">
+                <i class="fas fa-search-plus me-2"></i>{{ search_type }} Search Results
+            </h2>
+            <div>
+                <button onclick="exportResults()" class="btn btn-outline-secondary me-2">
+                    <i class="fas fa-download me-1"></i>Export
+                </button>
+                <button onclick="window.print()" class="btn btn-outline-info">
+                    <i class="fas fa-print me-1"></i>Print
+                </button>
+            </div>
+        </div>
+        
+        <!-- Search Query Info -->
+        <div class="card bg-secondary mb-4">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h5 class="mb-1">Query: <code class="text-primary">{{ query }}</code></h5>
+                        <p class="text-muted mb-0">Search completed at: {{ moment().format('MMMM Do YYYY, h:mm:ss a') }}</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="javascript:history.back()" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-left me-1"></i>New Search
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if search_type == 'Username' %}
+    <!-- Username Search Results -->
+    <div class="row">
+        <!-- Summary Card -->
+        <div class="col-lg-4 mb-4">
+            <div class="card bg-primary text-white">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Search Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <h3 class="mb-0">{{ results.summary.found }}</h3>
+                            <small>Found</small>
+                        </div>
+                        <div class="col-4">
+                            <h3 class="mb-0">{{ results.summary.total_checked }}</h3>
+                            <small>Checked</small>
+                        </div>
+                        <div class="col-4">
+                            <h3 class="mb-0">{{ results.summary.success_rate }}</h3>
+                            <small>Rate</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Platform Results -->
+        <div class="col-lg-8">
+            <div class="card bg-secondary">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-globe me-2"></i>Platform Results</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        {% for platform, data in results.platforms.items() %}
+                        <div class="col-md-6">
+                            <div class="card bg-dark">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-0">{{ platform }}</h6>
+                                        {% if data.status == 'found' %}
+                                            <span class="badge bg-success">Found</span>
+                                        {% elif data.status == 'not_found' %}
+                                            <span class="badge bg-secondary">Not Found</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Error</span>
+                                        {% endif %}
+                                    </div>
+                                    {% if data.status == 'found' %}
+                                        <a href="{{ data.url }}" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
+                                            <i class="fas fa-external-link-alt me-1"></i>View Profile
+                                        </a>
+                                    {% elif data.status == 'error' %}
+                                        <small class="text-muted">{{ data.error }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% elif search_type == 'Domain' %}
+    <!-- Domain Search Results -->
+    <div class="row g-4">
+        <!-- Basic Info -->
+        <div class="col-lg-6">
+            <div class="card bg-secondary h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-server me-2"></i>Basic Information</h5>
+                </div>
+                <div class="card-body">
+                    {% if results.basic_info.http %}
+                        <h6 class="text-info">HTTP Response</h6>
+                        <ul class="list-unstyled mb-3">
+                            <li><strong>Status Code:</strong> {{ results.basic_info.http.status_code }}</li>
+                            <li><strong>Redirects:</strong> {{ 'Yes' if results.basic_info.http.redirects else 'No' }}</li>
+                        </ul>
+                    {% endif %}
+                    
+                    {% if results.basic_info.https %}
+                        <h6 class="text-success">HTTPS Status</h6>
+                        <ul class="list-unstyled mb-3">
+                            <li><strong>SSL Available:</strong> {{ 'Yes' if results.basic_info.https.ssl_available else 'No' }}</li>
+                            {% if results.basic_info.https.status_code %}
+                                <li><strong>Status Code:</strong> {{ results.basic_info.https.status_code }}</li>
+                            {% endif %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Web Content -->
+        <div class="col-lg-6">
+            <div class="card bg-secondary h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Web Content</h5>
+                </div>
+                <div class="card-body">
+                    {% if results.web_content.status == 'success' %}
+                        <ul class="list-unstyled mb-3">
+                            <li><strong>Content Length:</strong> {{ results.web_content.content_length }} characters</li>
+                            <li><strong>URL:</strong> <code>{{ results.web_content.url }}</code></li>
+                        </ul>
+                        <h6 class="text-info">Content Preview</h6>
+                        <div class="bg-dark p-3 rounded">
+                            <pre class="text-muted mb-0 small">{{ results.web_content.content_preview }}</pre>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Could not extract content: {{ results.web_content.error }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% elif search_type == 'Email' %}
+    <!-- Email Search Results -->
+    <div class="row g-4">
+        <!-- Email Validation -->
+        <div class="col-lg-4">
+            <div class="card bg-warning text-dark h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-check-circle me-2"></i>Validation</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li><strong>Format Valid:</strong> {{ 'Yes' if results.validation.format_valid else 'No' }}</li>
+                        <li><strong>Domain:</strong> <code>{{ results.validation.domain }}</code></li>
+                        <li><strong>Local Part:</strong> <code>{{ results.validation.local_part }}</code></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Domain Analysis -->
+        <div class="col-lg-8">
+            <div class="card bg-secondary h-100">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-globe me-2"></i>Domain Analysis</h5>
+                </div>
+                <div class="card-body">
+                    {% if results.domain_info.basic_info %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="text-info">HTTP Status</h6>
+                                {% if results.domain_info.basic_info.http.status_code %}
+                                    <p>Status: {{ results.domain_info.basic_info.http.status_code }}</p>
+                                {% else %}
+                                    <p class="text-muted">{{ results.domain_info.basic_info.http.error }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-success">HTTPS Status</h6>
+                                <p>SSL: {{ 'Available' if results.domain_info.basic_info.https.ssl_available else 'Not Available' }}</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Breach Check Info -->
+        <div class="col-12">
+            <div class="card bg-info text-dark">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-shield-alt me-2"></i>Breach Check Information</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">{{ results.breach_check.note }}</p>
+                    <p class="mb-0"><strong>Recommendation:</strong> {{ results.breach_check.recommendation }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<!-- Raw Results (Collapsible) -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card bg-dark">
+            <div class="card-header">
+                <button class="btn btn-link text-white text-decoration-none p-0" 
+                        type="button" 
+                        data-bs-toggle="collapse" 
+                        data-bs-target="#rawResults">
+                    <h6 class="mb-0"><i class="fas fa-code me-2"></i>Raw Results (Technical Details)</h6>
+                </button>
+            </div>
+            <div class="collapse" id="rawResults">
+                <div class="card-body">
+                    <pre class="text-light mb-0"><code>{{ results | tojson(indent=2) }}</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function exportResults() {
+    const results = {{ results | tojson }};
+    const dataStr = JSON.stringify(results, null, 2);
+    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+    
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(dataBlob);
+    link.download = '{{ search_type.lower() }}_search_{{ query }}_results.json';
+    link.click();
+}
+
+// Add moment.js for time formatting
+function moment() {
+    return {
+        format: function(format) {
+            return new Date().toLocaleString();
+        }
+    };
+}
+</script>
+{% endblock %}

